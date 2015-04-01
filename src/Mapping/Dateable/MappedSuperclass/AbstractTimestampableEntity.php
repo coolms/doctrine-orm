@@ -13,7 +13,7 @@ namespace CmsDoctrineORM\Mapping\Dateable\MappedSuperclass;
 use Zend\Form\Annotation as Form,
     Doctrine\ORM\Mapping as ORM,
     Gedmo\Mapping\Annotation as Gedmo,
-    CmsBase\Mapping\Dateable\TimestampableInterface,
+    CmsCommon\Mapping\Dateable\TimestampableInterface,
     CmsDoctrineORM\Mapping\Common\MappedSuperclass\AbstractIdentifiableEntity,
     CmsDoctrineORM\Mapping\Dateable\Traits\TimestampableTrait;
 

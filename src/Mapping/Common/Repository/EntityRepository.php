@@ -11,7 +11,7 @@
 namespace CmsDoctrineORM\Mapping\Common\Repository;
 
 use Doctrine\ORM\EntityRepository as DoctrineEntityRepository,
-    CmsBase\Persistence\MapperInterface;
+    CmsCommon\Persistence\MapperInterface;
 
 /**
  * @author  Dmitry Popov <d.popov@altgraphic.com>

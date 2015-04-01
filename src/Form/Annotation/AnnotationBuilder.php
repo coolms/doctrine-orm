@@ -13,8 +13,8 @@ namespace CmsDoctrineORM\Form\Annotation;
 use Zend\Cache\Storage\StorageInterface,
     Doctrine\Common\Persistence\ObjectManager,
     DoctrineORMModule\Form\Annotation\AnnotationBuilder as DoctrineAnnotationBuilder,
-    CmsBase\Cache\StorageProviderInterface,
-    CmsBase\Form\Annotation\AnnotationBuilderCacheTrait;
+    CmsCommon\Cache\StorageProviderInterface,
+    CmsCommon\Form\Annotation\AnnotationBuilderCacheTrait;
 
 class AnnotationBuilder extends DoctrineAnnotationBuilder implements StorageProviderInterface
 {

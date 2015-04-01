@@ -12,8 +12,8 @@ namespace CmsDoctrineORM\Mapping\Hierarchy\MappedSuperclass;
 
 use Doctrine\ORM\Mapping as ORM,
     Gedmo\Mapping\Annotation as Gedmo,
-    CmsBase\Mapping\Common\IdentifiableInterface,
-    CmsBase\Mapping\Hierarchy\HierarchyInterface,
+    CmsCommon\Mapping\Common\IdentifiableInterface,
+    CmsCommon\Mapping\Hierarchy\HierarchyInterface,
     CmsDoctrineORM\Mapping\Hierarchy\Traits\HierarchyTrait;
 
 /**

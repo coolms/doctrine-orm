@@ -12,7 +12,7 @@ namespace CmsDoctrineORM\Mapping\Hierarchy\Traits;
 
 use Doctrine\Common\Collections\ArrayCollection,
     Doctrine\Common\Collections\Collection,
-    CmsBase\Mapping\Hierarchy\HierarchyInterface;
+    CmsCommon\Mapping\Hierarchy\HierarchyInterface;
 
 /**
  * Trait for the entity to be a part of the hierarchy

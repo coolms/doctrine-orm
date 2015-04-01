@@ -13,7 +13,7 @@ namespace CmsDoctrineORM\Form\Annotation;
 use Zend\ServiceManager\AbstractPluginManager,
     Zend\ServiceManager\ServiceLocatorInterface,
     Doctrine\ORM\EntityManager,
-    CmsBase\Form\Annotation\FormAbstractServiceFactory as BaseAnnotationFormAbstractServiceFactory;
+    CmsCommon\Form\Annotation\FormAbstractServiceFactory as BaseAnnotationFormAbstractServiceFactory;
 
 class FormAbstractServiceFactory extends BaseAnnotationFormAbstractServiceFactory
 {

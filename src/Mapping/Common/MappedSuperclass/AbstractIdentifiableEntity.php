@@ -12,7 +12,7 @@ namespace CmsDoctrineORM\Mapping\Common\MappedSuperclass;
 
 use Zend\Form\Annotation as Form,
     Doctrine\ORM\Mapping as ORM,
-    CmsBase\Mapping\Common\IdentifiableInterface,
+    CmsCommon\Mapping\Common\IdentifiableInterface,
     CmsDoctrineORM\Mapping\Common\Traits\IdentifiableTrait;
 
 /**

@@ -12,7 +12,7 @@ namespace CmsDoctrineORM\Mapping\Hierarchy\Repository;
 
 use Doctrine\ORM\AbstractQuery,
     Gedmo\Tree\Entity\Repository\NestedTreeRepository as GedmoNestedTreeRepository,
-    CmsBase\Persistence\HierarchyMapperInterface,
+    CmsCommon\Persistence\HierarchyMapperInterface,
     CmsDoctrineORM\Mapping\Common\Repository\EntityRepositoryTrait;
 
 /**

@@ -13,7 +13,7 @@ namespace CmsDoctrineORM\Mapping\Translatable\MappedSuperclass;
 use Zend\Form\Annotation as Form,
     Doctrine\ORM\Mapping as ORM,
     Gedmo\Translatable\Entity\MappedSuperclass\AbstractPersonalTranslation,
-    CmsBase\Mapping\Common\ObjectableInterface;
+    CmsCommon\Mapping\Common\ObjectableInterface;
 
 /**
  * Abstract translation class
