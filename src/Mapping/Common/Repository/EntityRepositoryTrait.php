@@ -33,9 +33,10 @@ trait EntityRepositoryTrait
 
     /**
      * @param string $alias
+     * @param string $indexBy The index for the from.
      * @return QueryBuilder
      */
-    abstract public function createQueryBuilder($alias);
+    abstract public function createQueryBuilder($alias, $indexBy = null);
 
     /**
      * @return string
