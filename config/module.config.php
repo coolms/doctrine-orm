@@ -1,9 +1,9 @@
 <?php
 /**
- * CoolMS2 Doctrine ORM module (http://www.coolms.com/)
+ * CoolMS2 Doctrine ORM Module (http://www.coolms.com/)
  *
  * @link      http://github.com/coolms/doctrine-orm for the canonical source repository
- * @copyright Copyright (c) 2006-2014 Altgraphic, ALC (http://www.altgraphic.com)
+ * @copyright Copyright (c) 2006-2015 Altgraphic, ALC (http://www.altgraphic.com)
  * @license   http://www.coolms.com/license/new-bsd New BSD License
  * @author    Dmitry Popov <d.popov@altgraphic.com>
  */
@@ -12,6 +12,13 @@ namespace CmsDoctrineORM;
 
 return [
     'doctrine' => [
+        'cache' => [
+            'filesystem' => [
+                'class'     => 'Doctrine\Common\Cache\FilesystemCache',
+                'directory' => '/../../data/DoctrineModule/cache',
+            ],
+        ],
+        'config_cache_enabled' => true,
         'configuration' => [
             'orm_default' => [
                 'metadata_cache'     => 'array',
@@ -28,19 +35,7 @@ return [
                 ],
             ],
         ],
-        'config_cache_enabled' => true,
-        'cache' => [
-            'filesystem' => [
-                'class'     => 'Doctrine\Common\Cache\FilesystemCache',
-                'directory' => '/../../data/DoctrineModule/cache',
-            ],
-        ],
         'discriminator_map' => [
-            'orm_default' => [
-                
-            ],
-        ],
-        'relation_map' => [
             'orm_default' => [
                 
             ],
@@ -48,12 +43,24 @@ return [
         'eventmanager' => [
             'orm_default' => [
                 'subscribers' => [
-                    'CmsDoctrineORM\Mapping\Metadatable'    => 'CmsDoctrine\Mapping\Metadatable\MetadatableSubscriber',
-                    'CmsDoctrineORM\Mapping\Timestampable'  => 'CmsDoctrine\Mapping\Dateable\TimestampableSubscriber',
-                    'CmsDoctrineORM\Mapping\Hierarchy'      => 'CmsDoctrine\Mapping\Hierarchy\HierarchySubscriber',
-                    'CmsDoctrineORM\Mapping\Sluggable'      => 'Gedmo\Sluggable\SluggableListener',
-                    'CmsDoctrineORM\Mapping\Translatable'   => 'CmsDoctrine\Mapping\Translatable\TranslatableSubscriber',
+                    'CmsDoctrine\Mapping\ElementCollection\ElementCollectionSubscriber'
+                        => 'CmsDoctrine\Mapping\ElementCollection\ElementCollectionSubscriber',
+                    'CmsDoctrine\Mapping\Metadatable\MetadatableSubscriber'
+                        => 'CmsDoctrine\Mapping\Metadatable\MetadatableSubscriber',
+                    'CmsDoctrine\Mapping\Dateable\TimestampableSubscriber'
+                        => 'CmsDoctrine\Mapping\Dateable\TimestampableSubscriber',
+                    'CmsDoctrine\Mapping\Hierarchy\HierarchySubscriber'
+                        => 'CmsDoctrine\Mapping\Hierarchy\HierarchySubscriber',
+                    'Gedmo\Sluggable\SluggableListener'
+                        => 'Gedmo\Sluggable\SluggableListener',
+                    'CmsDoctrine\Mapping\Translatable\TranslatableSubscriber'
+                        => 'CmsDoctrine\Mapping\Translatable\TranslatableSubscriber',
                 ],
+            ],
+        ],
+        'relation_map' => [
+            'orm_default' => [
+                
             ],
         ],
         /*'driver' => [
