@@ -57,7 +57,7 @@ class TablePrefixListener extends AbstractListenerAggregate implements EventSubs
     {
         $sm = $e->getApplication()->getServiceManager();
         /* @var $om \Doctrine\ORM\EntityManager */
-        $om = $sm->get('Doctrine\\ORM\\EntityManager');
+        $om = $sm->get('CmsDoctrine\\ObjectManager');
         $om->getEventManager()->addEventSubscriber($this);
     }
 

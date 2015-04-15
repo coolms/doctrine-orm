@@ -43,6 +43,8 @@ return [
         'eventmanager' => [
             'orm_default' => [
                 'subscribers' => [
+                    'CmsDoctrine\Mapping\Relation\RelationSubscriber'
+                        => 'CmsDoctrine\Mapping\Relation\RelationSubscriber',
                     'CmsDoctrine\Mapping\ElementCollection\ElementCollectionSubscriber'
                         => 'CmsDoctrine\Mapping\ElementCollection\ElementCollectionSubscriber',
                     'CmsDoctrine\Mapping\Metadatable\MetadatableSubscriber'
@@ -56,11 +58,6 @@ return [
                     'CmsDoctrine\Mapping\Translatable\TranslatableSubscriber'
                         => 'CmsDoctrine\Mapping\Translatable\TranslatableSubscriber',
                 ],
-            ],
-        ],
-        'relation_map' => [
-            'orm_default' => [
-                
             ],
         ],
         /*'driver' => [
@@ -81,30 +78,38 @@ return [
     'doctrine_factories' => [
         'entitymanager'     => 'CmsDoctrineORM\Service\EntityManagerFactory',
         'discriminator_map' => 'CmsDoctrineORM\Service\DiscriminatorMapFactory',
-        'relation_map'      => 'CmsDoctrineORM\Service\RelationMapFactory',
     ],
     'form_elements' => [
         'abstract_factories' => [
-            'CmsDoctrineORM\EntityForm' => 'CmsDoctrineORM\Form\Annotation\FormAbstractServiceFactory',
+            'CmsDoctrineORM\Form\Annotation\FormAbstractServiceFactory'
+                => 'CmsDoctrineORM\Form\Annotation\FormAbstractServiceFactory',
         ],
     ],
     'listeners' => [
-        'CmsDoctrineORM\EventListener\TablePrefixListener' => 'CmsDoctrineORM\EventListener\TablePrefixListener',
+        'CmsDoctrineORM\EventListener\TablePrefixListener'
+            => 'CmsDoctrineORM\EventListener\TablePrefixListener',
     ],
     'mappers' => [
         'abstract_factories' => [
-            'CmsDoctrineORM\Mapper' => 'CmsDoctrineORM\Persistence\MapperAbstractServiceFactory',
+            'CmsDoctrineORM\Persistence\MapperAbstractServiceFactory'
+                => 'CmsDoctrineORM\Persistence\MapperAbstractServiceFactory',
         ],
     ],
     'service_manager' => [
+        'aliases' => [
+            'CmsDoctrine\ObjectManager' => 'Doctrine\ORM\EntityManager',
+        ],
         'invokables' => [
-            'CmsDoctrineORM\EventListener\TablePrefixListener' => 'CmsDoctrineORM\EventListener\TablePrefixListener',
-            'CmsDoctrineORM\Mapping\DefaultNamingStrategy'     => 'CmsDoctrineORM\Mapping\DefaultNamingStrategy',
+            'CmsDoctrineORM\EventListener\TablePrefixListener'
+                => 'CmsDoctrineORM\EventListener\TablePrefixListener',
+            'CmsDoctrineORM\Mapping\DefaultNamingStrategy'
+                => 'CmsDoctrineORM\Mapping\DefaultNamingStrategy',
         ],
     ],
     'session_containers' => [
         'abstract_factories' => [
-            'CmsDoctrineORM\SessionContainer' => 'CmsDoctrineORM\Session\ContainerAbstractServiceFactory',
+            'CmsDoctrineORM\Session\ContainerAbstractServiceFactory'
+                => 'CmsDoctrineORM\Session\ContainerAbstractServiceFactory',
         ],
     ],
 ];

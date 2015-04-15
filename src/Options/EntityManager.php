@@ -25,16 +25,6 @@ class EntityManager extends BaseEntityManagerOptions
     protected $discriminatorMap = 'orm_default';
 
     /**
-     * Set the connection key for the RelationMap, which is
-     * a service of type {@see \CmsDoctrine\Mapping\Relation\RelationSubscriber}.
-     * The RelationMap service name is assembled
-     * as "doctrine.relation_map.{key}"
-     *
-     * @var string
-     */
-    protected $relationMap = 'orm_default';
-
-    /**
      * @param  string $discriminatorMap
      * @return static
      */
@@ -50,23 +40,5 @@ class EntityManager extends BaseEntityManagerOptions
     public function getDiscriminatorMap()
     {
         return "doctrine.discriminator_map.{$this->discriminatorMap}";
-    }
-
-    /**
-     * @param  string $relationMap
-     * @return static
-     */
-    public function setRelationMap($relationMap)
-    {
-        $this->relationMap = (string) $relationMap;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getRelationMap()
-    {
-        return "doctrine.relation_map.{$this->relationMap}";
     }
 }
