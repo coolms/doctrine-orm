@@ -25,9 +25,26 @@ class DefaultNamingStrategy extends UnderscoreNamingStrategy
      */
     public function joinTableName($sourceEntity, $targetEntity, $propertyName = null)
     {
+        if (interface_exists($targetEntity) && strpos($targetEntity, 'Interface') !== false) {
+            $targetEntity = str_replace('Interface', '', $targetEntity);
+        }
+
         if ($propertyName) {
             return $this->classToTableName($sourceEntity) . '_' . $this->propertyToColumnName($propertyName, $targetEntity);
         }
+
         return $this->classToTableName($sourceEntity) . '_' . $this->classToTableName($targetEntity);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function joinKeyColumnName($entityName, $referencedColumnName = null)
+    {
+        if (interface_exists($entityName) && strpos($entityName, 'Interface') !== false) {
+            $entityName = str_replace('Interface', '', $entityName);
+        }
+
+        return parent::joinKeyColumnName($entityName, $referencedColumnName);
     }
 }

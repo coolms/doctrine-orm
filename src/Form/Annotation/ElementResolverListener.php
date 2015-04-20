@@ -95,8 +95,11 @@ class ElementResolverListener extends AbstractListenerAggregate
 
         $formSpec     = $e->getParam('formSpec');
         $metadata     = $this->objectManager->getClassMetadata($formSpec['object']);
+        $associations = $metadata->getAssociationMappings();
         $assocName    = $elementSpec['spec']['name'];
-        $elementSpec['spec']['options']['target_class'] =
-            $metadata->getAssociationMappings()[$assocName]['targetEntity'];
+
+        if (isset($associations[$assocName]['targetEntity'])) {
+            $elementSpec['spec']['options']['target_class'] = $associations[$assocName]['targetEntity'];
+        }
     }
 }
