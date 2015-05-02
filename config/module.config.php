@@ -14,24 +14,24 @@ return [
     'doctrine' => [
         'cache' => [
             'filesystem' => [
-                'class'     => 'Doctrine\Common\Cache\FilesystemCache',
+                'class' => 'Doctrine\Common\Cache\FilesystemCache',
                 'directory' => '/../../data/DoctrineModule/cache',
             ],
         ],
         'config_cache_enabled' => true,
         'configuration' => [
             'orm_default' => [
-                'metadata_cache'     => 'array',
-                'query_cache'        => 'array',
-                'result_cache'       => 'array',
-                'naming_strategy'    => 'CmsDoctrineORM\Mapping\DefaultNamingStrategy',
-                'generate_proxies'   => \Doctrine\Common\Proxy\AbstractProxyFactory::AUTOGENERATE_ALWAYS,
-                'proxy_dir'          => 'data/DoctrineORMModule/Proxy',
-                'proxy_namespace'    => 'DoctrineORMModule\Proxy',
+                'metadata_cache' => 'array',
+                'query_cache' => 'array',
+                'result_cache' => 'array',
+                'naming_strategy' => 'CmsDoctrineORM\Mapping\DefaultNamingStrategy',
+                'generate_proxies' => \Doctrine\Common\Proxy\AbstractProxyFactory::AUTOGENERATE_ALWAYS,
+                'proxy_dir' => 'data/DoctrineORMModule/Proxy',
+                'proxy_namespace' => 'DoctrineORMModule\Proxy',
                 'datetime_functions' => [
-                    'YEAR'   => 'DoctrineExtensions\Query\Mysql\Year',
+                    'YEAR' => 'DoctrineExtensions\Query\Mysql\Year',
                     'IFNULL' => 'DoctrineExtensions\Query\Mysql\IfNull',
-                    'DATE'   => 'CmsDoctrineORM\Query\Mysql\Date',
+                    'DATE' => 'CmsDoctrineORM\Query\Mysql\Date',
                 ],
             ],
         ],
@@ -76,7 +76,7 @@ return [
         ],*/
     ],
     'doctrine_factories' => [
-        'entitymanager'     => 'CmsDoctrineORM\Service\EntityManagerFactory',
+        'entitymanager' => 'CmsDoctrineORM\Service\EntityManagerFactory',
         'discriminator_map' => 'CmsDoctrineORM\Service\DiscriminatorMapFactory',
     ],
     'form_elements' => [
@@ -86,8 +86,8 @@ return [
         ],
     ],
     'listeners' => [
-        'CmsDoctrineORM\EventListener\TablePrefixListener'
-            => 'CmsDoctrineORM\EventListener\TablePrefixListener',
+        'CmsDoctrineORM\Event\TablePrefixListener'
+            => 'CmsDoctrineORM\Event\TablePrefixListener',
     ],
     'mappers' => [
         'abstract_factories' => [
@@ -96,12 +96,9 @@ return [
         ],
     ],
     'service_manager' => [
-        'aliases' => [
-            'CmsDoctrine\ObjectManager' => 'Doctrine\ORM\EntityManager',
-        ],
         'invokables' => [
-            'CmsDoctrineORM\EventListener\TablePrefixListener'
-                => 'CmsDoctrineORM\EventListener\TablePrefixListener',
+            'CmsDoctrineORM\Event\TablePrefixListener'
+                => 'CmsDoctrineORM\Event\TablePrefixListener',
             'CmsDoctrineORM\Mapping\DefaultNamingStrategy'
                 => 'CmsDoctrineORM\Mapping\DefaultNamingStrategy',
         ],

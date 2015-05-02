@@ -1,6 +1,6 @@
 <?php
 /**
- * CoolMS2 Doctrine ORM module (http://www.coolms.com/)
+ * CoolMS2 Doctrine ORM Module (http://www.coolms.com/)
  *
  * @link      http://github.com/coolms/doctrine-orm for the canonical source repository
  * @copyright Copyright (c) 2006-2015 Altgraphic, ALC (http://www.altgraphic.com)
@@ -8,7 +8,7 @@
  * @author    Dmitry Popov <d.popov@altgraphic.com>
  */
 
-namespace CmsDoctrineORM\EventListener;
+namespace CmsDoctrineORM\Event;
 
 use Zend\EventManager\AbstractListenerAggregate,
     Zend\EventManager\EventManagerInterface,
@@ -55,9 +55,9 @@ class TablePrefixListener extends AbstractListenerAggregate implements EventSubs
      */
     public function onBootstrap(MvcEvent $e)
     {
-        $sm = $e->getApplication()->getServiceManager();
+        $services = $e->getApplication()->getServiceManager();
         /* @var $om \Doctrine\ORM\EntityManager */
-        $om = $sm->get('CmsDoctrine\\ObjectManager');
+        $om = $services->get('Doctrine\\ORM\\EntityManager');
         $om->getEventManager()->addEventSubscriber($this);
     }
 
