@@ -26,6 +26,11 @@
   "autoload-dev" : {
     "psr-4" : {"CmsDoctrineORMTest\\" : "tests/"}
   },
+  "extra" : {
+    "branch-alias" : {
+      "dev-master" : "0.1.x-dev"
+    }
+  },
   "repositories" : [ {
     "type" : "vcs",
     "url" : "https://www.github.com/coolms/doctrine"
