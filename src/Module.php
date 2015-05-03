@@ -29,6 +29,9 @@ class Module implements
     {
         $moduleManager->loadModule('DoctrineModule');
         $moduleManager->loadModule('DoctrineORMModule');
+
+        // We need to register here manualy. Please see http://www.doctrine-project.org/jira/browse/DDC-1698
+        ProxyAutoloader::register('data/DoctrineORMModule/Proxy', 'DoctrineORMModule\Proxy');
     }
 
     /**
@@ -63,6 +66,6 @@ class Module implements
     public function onBootstrap(EventInterface $e)
     {
         // We need to register here manualy. Please see http://www.doctrine-project.org/jira/browse/DDC-1698
-        ProxyAutoloader::register('data/DoctrineORMModule/Proxy', 'DoctrineORMModule\Proxy');
+        //ProxyAutoloader::register('data/DoctrineORMModule/Proxy', 'DoctrineORMModule\Proxy');
     }
 }
