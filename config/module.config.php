@@ -65,8 +65,8 @@ return [
                 'subscribers' => [
                     'CmsDoctrine\Mapping\Relation\RelationSubscriber'
                         => 'CmsDoctrine\Mapping\Relation\RelationSubscriber',
-                    'CmsDoctrine\Mapping\ElementCollection\ElementCollectionSubscriber'
-                        => 'CmsDoctrine\Mapping\ElementCollection\ElementCollectionSubscriber',
+                    'CmsDoctrineORM\Mapping\ElementCollection\ElementCollectionSubscriber'
+                        => 'CmsDoctrineORM\Mapping\ElementCollection\ElementCollectionSubscriber',
                     'CmsDoctrine\Mapping\Metadatable\MetadatableSubscriber'
                         => 'CmsDoctrine\Mapping\Metadatable\MetadatableSubscriber',
                     'CmsDoctrine\Mapping\Dateable\TimestampableSubscriber'

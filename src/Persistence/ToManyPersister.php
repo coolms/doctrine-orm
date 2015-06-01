@@ -29,7 +29,7 @@ class ToManyPersister extends OneToManyPersister
     {
         $mapping = $collection->getMapping();
 
-        if ( ! isset($mapping['indexBy'])) {
+        if (!isset($mapping['indexBy'])) {
             throw new \BadMethodCallException('Selecting a collection by index is only supported on indexed collections.');
         }
 
@@ -61,10 +61,7 @@ class ToManyPersister extends OneToManyPersister
      */
     public function slice(PersistentCollection $collection, $offset, $length = null)
     {
-        $mapping   = $collection->getMapping();
-        $persister = $this->uow->getEntityPersister($mapping['targetEntity']);
-
-        return $persister->getOneToManyCollection($mapping, $collection->getOwner(), $offset, $length);
+        throw new \BadMethodCallException('Slicing a collection is not supported by this CollectionPersister.');
     }
 
     /**
@@ -104,7 +101,7 @@ class ToManyPersister extends OneToManyPersister
      */
     public function removeElement(PersistentCollection $collection, $element)
     {
-        // This can never happen. To many can only be inverse side.
+        // This can never happen. To many can only be read-only.
         return;
     }
 }

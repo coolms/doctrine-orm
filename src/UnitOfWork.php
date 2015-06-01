@@ -3,20 +3,16 @@
  * CoolMS2 Doctrine ORM Module (http://www.coolms.com/)
  *
  * @link      http://github.com/coolms/doctrine-orm for the canonical source repository
- * @copyright Copyright (c) 2006-2015 Altgraphic, ALC (http://www.altgraphic.com)
- * @license   http://www.coolms.com/license/new-bsd New BSD License
- * @author    Dmitry Popov <d.popov@altgraphic.com>
+ * @license   http://github.com/doctrine/doctrine2/blob/master/LICENSE
  */
 
 namespace CmsDoctrineORM;
 
-use Doctrine\ORM\UnitOfWork as DoctrineORMUnitOfWork;
-
-use Doctrine\ORM\Mapping\ClassMetadata;
-
-use Doctrine\ORM\Persisters\Collection\OneToManyPersister;
-use Doctrine\ORM\Persisters\Collection\ManyToManyPersister;
-use CmsDoctrineORM\Persistence\ToManyPersister;
+use Doctrine\ORM\UnitOfWork as DoctrineORMUnitOfWork,
+    Doctrine\ORM\Mapping\ClassMetadata,
+    Doctrine\ORM\Persisters\Collection\OneToManyPersister,
+    Doctrine\ORM\Persisters\Collection\ManyToManyPersister,
+    CmsDoctrineORM\Persistence\ToManyPersister;
 
 /**
  * {@inheritDoc}
@@ -81,7 +77,7 @@ class UnitOfWork extends DoctrineORMUnitOfWork
     }
 
     /**
-     * @return ReflectionClass
+     * @return \ReflectionClass
      */
     protected function getReflectionClass()
     {
