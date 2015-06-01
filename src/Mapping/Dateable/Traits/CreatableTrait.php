@@ -10,11 +10,13 @@
 
 namespace CmsDoctrineORM\Mapping\Dateable\Traits;
 
+use DateTime;
+
 trait CreatableTrait
 {
     /**
-     * @var \DateTime
-     * 
+     * @var DateTime
+     *
      * @Gedmo\Timestampable(on="create")
      * @ORM\Column(type="datetime",nullable=false)
      * @Form\Type("StaticElement")
@@ -29,9 +31,9 @@ trait CreatableTrait
     /**
      * Set created at
      * 
-     * @param \DateTime $createdAt
+     * @param DateTime $createdAt
      */
-    public function setCreatedAt(\DateTime $createdAt)
+    public function setCreatedAt(DateTime $createdAt)
     {
         $this->createdAt = $createdAt;
     }
@@ -39,7 +41,7 @@ trait CreatableTrait
     /**
      * Get created at
      * 
-     * @return \DateTime
+     * @return DateTime
      */
     public function getCreatedAt()
     {

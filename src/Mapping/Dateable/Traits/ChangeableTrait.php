@@ -10,16 +10,18 @@
 
 namespace CmsDoctrineORM\Mapping\Dateable\Traits;
 
+use DateTime;
+
 /**
  * Interface for the entity that might change
- * 
+ *
  * @author Dmitry Popov <d.popov@altgraphic.com>
  */
 trait ChangeableTrait
 {
     /**
-     * @var \DateTime
-     * 
+     * @var DateTime
+     *
      * @ORM\Column(type="datetime",nullable=true)
      * @Gedmo\Timestampable(on="change")
      * @Form\Type("StaticElement")
@@ -32,15 +34,15 @@ trait ChangeableTrait
     protected $changedAt;
 
     /**
-     * @param \DateTime $changedAt
+     * @param DateTime $changedAt
      */
-    public function setChangedAt(\DateTime $changedAt)
+    public function setChangedAt(DateTime $changedAt)
     {
         $this->changedAt = $changedAt;
     }
 
     /**
-     * @return \DateTime
+     * @return DateTime
      */
     public function getChangedAt()
     {

@@ -40,6 +40,26 @@ return [
                 
             ],
         ],
+        'driver' => [
+            'cmsdoctrineorm_dateable_metadata_driver' => [
+                'class' => 'Doctrine\ORM\Mapping\Driver\AnnotationDriver',
+                'cache' => 'array',
+                'paths' => __DIR__ . '/../src/Mapping/Dateable/Entity',
+            ],
+            /*'translatable_metadata_driver' => [
+                'class' => 'Doctrine\ORM\Mapping\Driver\AnnotationDriver',
+                'cache' => 'array',
+                'paths' => [
+                    'vendor/gedmo/doctrine-extensions/lib/Gedmo/Translatable/Entity',
+                ],
+            ],*/
+            'orm_default' => [
+                'drivers' => [
+                    'CmsDoctrineORM\Mapping\Dateable\Entity' => 'cmsdoctrineorm_dateable_metadata_driver',
+                    //'Gedmo\Translatable\Entity' => 'translatable_metadata_driver',
+                ],
+            ],
+        ],
         'eventmanager' => [
             'orm_default' => [
                 'subscribers' => [
@@ -60,20 +80,6 @@ return [
                 ],
             ],
         ],
-        /*'driver' => [
-            'translatable_metadata_driver' => [
-                'class' => 'Doctrine\ORM\Mapping\Driver\AnnotationDriver',
-                'cache' => 'array',
-                'paths' => [
-                    'vendor/gedmo/doctrine-extensions/lib/Gedmo/Translatable/Entity',
-                ],
-            ],
-            'orm_default' => [
-                'drivers' => [
-                    'Gedmo\Translatable\Entity' => 'translatable_metadata_driver',
-                ],
-            ],
-        ],*/
     ],
     'doctrine_factories' => [
         'entitymanager' => 'CmsDoctrineORM\Service\EntityManagerFactory',
@@ -83,6 +89,16 @@ return [
         'abstract_factories' => [
             'CmsDoctrineORM\Form\Annotation\FormAbstractServiceFactory'
                 => 'CmsDoctrineORM\Form\Annotation\FormAbstractServiceFactory',
+        ],
+    ],
+    'hydrators' => [
+        'aliases' => [
+            'DoctrineModule\Stdlib\Hydrator\DoctrineObject'
+                => 'CmsDoctrine\Stdlib\Hydrator\DoctrineObject',
+        ],
+        'factories' => [
+            'CmsDoctrine\Stdlib\Hydrator\DoctrineObject'
+                => 'CmsDoctrineORM\Factory\DoctrineObjectHydratorFactory'
         ],
     ],
     'listeners' => [

@@ -10,11 +10,13 @@
 
 namespace CmsDoctrineORM\Mapping\Dateable\Traits;
 
+use DateTime;
+
 trait UpdatableTrait
 {
     /**
-     * @var \DateTime
-     * 
+     * @var DateTime
+     *
      * @Gedmo\Timestampable(on="update")
      * @ORM\Column(type="datetime",nullable=true)
      * @Form\Type("StaticElement")
@@ -28,18 +30,18 @@ trait UpdatableTrait
 
     /**
      * Set updated at
-     * 
-     * @param \DateTime $updatedAt
+     *
+     * @param DateTime $updatedAt
      */
-    public function setUpdatedAt(\DateTime $updatedAt = null)
+    public function setUpdatedAt(DateTime $updatedAt = null)
     {
         $this->updatedAt = $updatedAt;
     }
 
     /**
      * Get updated at
-     * 
-     * @return \DateTime
+     *
+     * @return DateTime
      */
     public function getUpdatedAt()
     {

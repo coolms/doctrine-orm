@@ -10,11 +10,13 @@
 
 namespace CmsDoctrineORM\Mapping\Dateable\Traits;
 
+use DateTime;
+
 trait ExpirableTrait
 {
     /**
-     * @var \DateTime
-     * 
+     * @var DateTime
+     *
      * @ORM\Column(type="datetime",nullable=true)
      * @Form\Type("DateTime")
      * @Form\Attributes({
@@ -33,18 +35,18 @@ trait ExpirableTrait
 
     /**
      * Set expire at
-     * 
-     * @param \DateTime $expireAt
+     *
+     * @param DateTime $expireAt
      */
-    public function setExpireAt(\DateTime $expireAt = null)
+    public function setExpireAt(DateTime $expireAt = null)
     {
         $this->expireAt = $expireAt;
     }
 
     /**
      * Get expire at
-     * 
-     * @return \DateTime
+     *
+     * @return DateTime
      */
     public function getExpireAt()
     {
