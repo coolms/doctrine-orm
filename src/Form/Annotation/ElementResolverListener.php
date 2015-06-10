@@ -87,8 +87,8 @@ class ElementResolverListener extends AbstractListenerAggregate
             return;
         }
 
-        if (isset($elementSpec['spec']['options']['target_class'])
-            && class_exists($elementSpec['spec']['options']['target_class'])
+        if (isset($elementSpec['spec']['options']['target_class']) &&
+            class_exists($elementSpec['spec']['options']['target_class'])
         ) {
             return;
         }

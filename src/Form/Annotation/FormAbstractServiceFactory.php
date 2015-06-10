@@ -13,9 +13,9 @@ namespace CmsDoctrineORM\Form\Annotation;
 use Zend\ServiceManager\AbstractPluginManager,
     Zend\ServiceManager\ServiceLocatorInterface,
     Doctrine\ORM\EntityManager,
-    CmsCommon\Form\Annotation\FormAbstractServiceFactory as BaseAnnotationFormAbstractServiceFactory;
+    CmsCommon\Form\Annotation\FormAbstractServiceFactory as AnnotationFormAbstractServiceFactory;
 
-class FormAbstractServiceFactory extends BaseAnnotationFormAbstractServiceFactory
+class FormAbstractServiceFactory extends AnnotationFormAbstractServiceFactory
 {
     /**
      * {@inheritDoc}

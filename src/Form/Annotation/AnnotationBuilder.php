@@ -14,11 +14,13 @@ use Zend\Cache\Storage\StorageInterface,
     Doctrine\Common\Persistence\ObjectManager,
     DoctrineORMModule\Form\Annotation\AnnotationBuilder as DoctrineAnnotationBuilder,
     CmsCommon\Cache\StorageProviderInterface,
-    CmsCommon\Form\Annotation\AnnotationBuilderCacheTrait;
+    CmsCommon\Form\Annotation\AnnotationBuilderCacheTrait,
+    CmsCommon\Form\Annotation\AnnotationBuilderTrait;
 
 class AnnotationBuilder extends DoctrineAnnotationBuilder implements StorageProviderInterface
 {
-    use AnnotationBuilderCacheTrait;
+    use AnnotationBuilderCacheTrait,
+        AnnotationBuilderTrait;
 
     /**
      * {@inheritDoc}
