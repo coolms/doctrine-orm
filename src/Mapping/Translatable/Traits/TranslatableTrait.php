@@ -1,6 +1,6 @@
 <?php
 /**
- * CoolMS2 Doctrine ORM module (http://www.coolms.com/)
+ * CoolMS2 Doctrine ORM Module (http://www.coolms.com/)
  *
  * @link      http://github.com/coolms/doctrine-orm for the canonical source repository
  * @copyright Copyright (c) 2006-2015 Altgraphic, ALC (http://www.altgraphic.com)
@@ -24,7 +24,8 @@ trait TranslatableTrait
     protected $translations;
 
     /**
-     * @var string Used locale to override Translation listener's locale this is not a mapped field of entity metadata, just a simple property
+     * @var string Used locale to override Translation listener's locale
+     * this is not a mapped field of entity metadata, just a simple property
      *
      * @Gedmo\Locale
      * @Form\Type("Select")
@@ -118,6 +119,7 @@ trait TranslatableTrait
         if ($locale instanceof \CmsLocale\Mapping\LocaleInterface) {
             $locale = $locale->getCanonicalName();
         }
+
         $this->locale = $locale;
     }
 

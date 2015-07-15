@@ -65,8 +65,6 @@ return [
                 'subscribers' => [
                     'CmsDoctrine\Mapping\Relation\RelationSubscriber'
                         => 'CmsDoctrine\Mapping\Relation\RelationSubscriber',
-                    'CmsDoctrineORM\Mapping\ElementCollection\ElementCollectionSubscriber'
-                        => 'CmsDoctrineORM\Mapping\ElementCollection\ElementCollectionSubscriber',
                     'CmsDoctrine\Mapping\Metadatable\MetadatableSubscriber'
                         => 'CmsDoctrine\Mapping\Metadatable\MetadatableSubscriber',
                     'CmsDoctrine\Mapping\Dateable\TimestampableSubscriber'
@@ -109,6 +107,10 @@ return [
         'abstract_factories' => [
             'CmsDoctrineORM\Persistence\MapperAbstractServiceFactory'
                 => 'CmsDoctrineORM\Persistence\MapperAbstractServiceFactory',
+        ],
+        'initializers' => [
+            'CmsDoctrineORM\Initializer\TranslatableLocaleInitializer'
+                => 'CmsDoctrineORM\Initializer\TranslatableLocaleInitializer',
         ],
     ],
     'service_manager' => [

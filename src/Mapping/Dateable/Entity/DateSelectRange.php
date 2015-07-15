@@ -10,14 +10,15 @@
 
 namespace CmsDoctrineORM\Mapping\Dateable\Entity;
 
-use Zend\Form\Annotation as Form,
+use DateTime,
+    Zend\Form\Annotation as Form,
     Doctrine\ORM\Mapping as ORM,
     CmsCommon\Mapping\Dateable\RangeableInterface,
     CmsDoctrineORM\Mapping\Dateable\Traits\RangeableTrait;
 
 /**
  * @ORM\Embeddable
- * @Form\Name("range")
+ * @Form\Name("dateRange")
  * @Form\Instance("CmsDoctrineORM\Mapping\Dateable\Entity\DateSelectRange")
  * @Form\Hydrator("DoctrineModule\Stdlib\Hydrator\DoctrineObject")
  * @Form\Type("DateSelectRange")
@@ -29,4 +30,16 @@ use Zend\Form\Annotation as Form,
 class DateSelectRange implements RangeableInterface
 {
     use RangeableTrait;
+
+    /**
+     * __construct
+     *
+     * @param string|int|DateTime $startDate
+     * @param string|int|DateTime $endDate
+     */
+    public function __construct($startDate = null, $endDate = null)
+    {
+        $this->setStartDate(new DateTime($startDate));
+        $this->setEndDate(new DateTime($endDate));
+    }
 }

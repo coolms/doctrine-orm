@@ -31,9 +31,6 @@ class Module implements
         $moduleManager->loadModule('DoctrineModule');
         $moduleManager->loadModule('DoctrineORMModule');
 
-        // Overriding default PersistentCollection
-        class_alias('CmsDoctrineORM\Persistence\PersistentCollection', 'Doctrine\ORM\PersistentCollection');
-
         $em = $moduleManager->getEventManager();
         $em->attach(ModuleEvent::EVENT_MERGE_CONFIG, [$this, 'onMergeConfig']);
     }

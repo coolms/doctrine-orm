@@ -10,25 +10,21 @@
 
 namespace CmsDoctrineORM\Initializer;
 
-use Zend\ServiceManager\AbstractPluginManager,
+use Locale,
+    Zend\ServiceManager\AbstractPluginManager,
     Zend\ServiceManager\InitializerInterface,
     Zend\ServiceManager\ServiceLocatorInterface,
-    DoctrineModule\Persistence\ObjectManagerAwareInterface;
+    CmsDoctrineORM\Query\TranslatableQueryProviderInterface;
 
-class EntityManagerInitializer implements InitializerInterface
+class TranslatableLocaleInitializer implements InitializerInterface
 {
 	/**
 	 * {@inheritDoc}
 	 */
 	public function initialize($instance, ServiceLocatorInterface $serviceLocator)
 	{
-        if ($instance instanceof ObjectManagerAwareInterface) {
-            if ($serviceLocator instanceof AbstractPluginManager) {
-            	$serviceLocator = $serviceLocator->getServiceLocator();
-            }
-
-            $objectManager = $serviceLocator->get('Doctrine\\ORM\\EntityManager');
-            $instance->setObjectManager($objectManager);
+        if ($instance instanceof TranslatableQueryProviderInterface) {
+            $instance->setTranslatableLocale(Locale::getDefault());
         }
 	}
 }

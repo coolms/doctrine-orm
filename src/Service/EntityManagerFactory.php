@@ -31,15 +31,7 @@ class EntityManagerFactory extends BaseEntityManagerFactory
         //       rely on its factory code
         $sl->get($options->getDiscriminatorMap());
 
-        $em = parent::createService($sl);
-
-        // Injecting overridden UnitOfWork into EntityManager
-        $refl = new \ReflectionClass(get_class($em));
-        $prop = $refl->getProperty('unitOfWork');
-        $prop->setAccessible(true);
-        $prop->setValue($em, new UnitOfWork($em));
-
-        return $em;
+        return parent::createService($sl);
     }
 
     /**
