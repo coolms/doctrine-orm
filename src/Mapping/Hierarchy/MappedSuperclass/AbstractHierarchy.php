@@ -11,7 +11,7 @@
 namespace CmsDoctrineORM\Mapping\Hierarchy\MappedSuperclass;
 
 use Doctrine\ORM\Mapping as ORM,
-    Gedmo\Mapping\Annotation as Gedmo,
+    Zend\Form\Annotation as Form,
     CmsCommon\Mapping\Common\IdentifiableInterface,
     CmsCommon\Mapping\Hierarchy\HierarchyInterface,
     CmsDoctrineORM\Mapping\Hierarchy\Traits\HierarchyTrait;
@@ -20,6 +20,7 @@ use Doctrine\ORM\Mapping as ORM,
  * Adjacency list hierarchy representation
  *
  * @ORM\MappedSuperclass
+ * @Form\Exclude()
  */
 abstract class AbstractHierarchy implements 
         IdentifiableInterface,

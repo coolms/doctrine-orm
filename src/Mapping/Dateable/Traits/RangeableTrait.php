@@ -39,11 +39,11 @@ trait RangeableTrait
     }
 
     /**
-     * @param DateTime $date
+     * @param string|int|DateTime $date
      */
-    public function setStartDate(DateTime $date)
+    public function setStartDate($date)
     {
-        $this->startDate = $date;
+        $this->startDate = $this->normalizeDate($date);
     }
 
     /**
@@ -55,10 +55,23 @@ trait RangeableTrait
     }
 
     /**
-     * @param DateTime $date
+     * @param string|int|DateTime $date
      */
-    public function setEndDate(DateTime $date)
+    public function setEndDate($date)
     {
-        $this->endDate = $date;
+        $this->endDate = $this->normalizeDate($date);
+    }
+
+    /**
+     * @param string|int|DateTime $date
+     * @return DateTime
+     */
+    private function normalizeDate($date)
+    {
+        if ($date instanceof DateTime) {
+            return $date;
+        }
+
+        return new DateTime(is_int($date) ? "@$date" : $date);
     }
 }

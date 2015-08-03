@@ -1,6 +1,6 @@
 <?php
 /**
- * CoolMS2 Doctrine ORM module (http://www.coolms.com/)
+ * CoolMS2 Doctrine ORM Module (http://www.coolms.com/)
  *
  * @link      http://github.com/coolms/doctrine-orm for the canonical source repository
  * @copyright Copyright (c) 2006-2015 Altgraphic, ALC (http://www.altgraphic.com)
@@ -8,11 +8,10 @@
  * @author    Dmitry Popov <d.popov@altgraphic.com>
  */
 
-namespace CmsDoctrineORM\Service;
+namespace CmsDoctrineORM\Factory;
 
 use Zend\ServiceManager\ServiceLocatorInterface,
-    DoctrineORMModule\Service\EntityManagerFactory as BaseEntityManagerFactory,
-    CmsDoctrineORM\UnitOfWork;
+    DoctrineORMModule\Service\EntityManagerFactory as BaseEntityManagerFactory;
 
 class EntityManagerFactory extends BaseEntityManagerFactory
 {

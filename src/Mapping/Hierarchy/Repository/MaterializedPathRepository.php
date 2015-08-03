@@ -11,14 +11,14 @@
 namespace CmsDoctrineORM\Mapping\Hierarchy\Repository;
 
 use Doctrine\ORM\AbstractQuery,
-    Gedmo\Tree\Entity\Repository\NestedTreeRepository as BaseNestedTreeRepository,
+    Gedmo\Tree\Entity\Repository\MaterializedPathRepository as GedmoMaterializedPathRepository,
     CmsCommon\Persistence\HierarchyMapperInterface,
     CmsDoctrineORM\Mapping\Common\Repository\EntityRepositoryTrait;
 
 /**
  * @author Dmitry Popov <d.popov@altgraphic.com>
  */
-class NestedTreeRepository extends BaseNestedTreeRepository implements HierarchyMapperInterface
+class MaterializedPathRepository extends GedmoMaterializedPathRepository implements HierarchyMapperInterface
 {
     use EntityRepositoryTrait;
 
@@ -28,7 +28,7 @@ class NestedTreeRepository extends BaseNestedTreeRepository implements Hierarchy
     public function childrenQueryBuilder($node = null, $direct = false, $orderBy = null,
             $direction = 'ASC', $includeNode = false, array $options = [])
     {
-        return parent::childrenQueryBuilder($node, $direct, $orderBy, $direction, $includeNode);
+        return parent::getChildrenQueryBuilder($node, $direct, $orderBy, $direction, $includeNode);
     }
 
     /**
@@ -84,16 +84,15 @@ class NestedTreeRepository extends BaseNestedTreeRepository implements Hierarchy
     public function getNodesHierarchyQueryBuilder($node = null, $direct = false,
             array $options = [], $includeNode = false)
     {
-        $meta   = $this->getClassMetadata();
-        $config = $this->listener->getConfiguration($this->getEntityManager(), $meta->getName());
+        $sortBy = [
+            'field' => null,
+            'dir'   => 'asc',
+        ];
 
-        return $this->childrenQueryBuilder(
-            $node,
-            $direct,
-            isset($config['root']) ? [$config['root'], $config['left']] : $config['left'],
-            'ASC',
-            $includeNode,
-            $options
-        );
+        if (isset($options['childSort'])) {
+            $sortBy = array_merge($sortBy, $options['childSort']);
+        }
+
+        return $this->getChildrenQueryBuilder($node, $direct, $sortBy['field'], $sortBy['dir'], $includeNode, $options);
     }
 }

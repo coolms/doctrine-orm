@@ -8,14 +8,11 @@
  * @author    Dmitry Popov <d.popov@altgraphic.com>
  */
 
-namespace CmsDoctrineORM\Mapping\Common;
+namespace CmsDoctrineORM\Mapping\Blameable\Traits;
 
-/**
- * General entity interface
- *
- * @author Dmitry Popov <d.popov@altgraphic.com>
- */
-interface EntityInterface
+trait BlameableTrait
 {
-    
+    use CreatableTrait,
+        UpdatableTrait,
+        ChangeableTrait;
 }

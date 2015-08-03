@@ -15,12 +15,13 @@ return [
         'cache' => [
             'filesystem' => [
                 'class' => 'Doctrine\Common\Cache\FilesystemCache',
-                'directory' => '/../../data/DoctrineModule/cache',
+                'directory' => 'data/DoctrineModule/cache',
             ],
         ],
-        'config_cache_enabled' => true,
         'configuration' => [
             'orm_default' => [
+                'table_prefix' => 'cms_',
+                'hydration_cache' => 'array',
                 'metadata_cache' => 'array',
                 'query_cache' => 'array',
                 'result_cache' => 'array',
@@ -44,19 +45,27 @@ return [
             'cmsdoctrineorm_dateable_metadata_driver' => [
                 'class' => 'Doctrine\ORM\Mapping\Driver\AnnotationDriver',
                 'cache' => 'array',
-                'paths' => __DIR__ . '/../src/Mapping/Dateable/Entity',
+                'paths' => __DIR__ . '/../src/Mapping/Dateable',
             ],
-            /*'translatable_metadata_driver' => [
+            'cmsdoctrineorm_translatable_metadata_driver' => [
                 'class' => 'Doctrine\ORM\Mapping\Driver\AnnotationDriver',
                 'cache' => 'array',
-                'paths' => [
-                    'vendor/gedmo/doctrine-extensions/lib/Gedmo/Translatable/Entity',
-                ],
-            ],*/
+                'paths' => __DIR__ . '/../src/Mapping/Translatable',
+            ],
             'orm_default' => [
                 'drivers' => [
-                    'CmsDoctrineORM\Mapping\Dateable\Entity' => 'cmsdoctrineorm_dateable_metadata_driver',
-                    //'Gedmo\Translatable\Entity' => 'translatable_metadata_driver',
+                    'CmsDoctrineORM\Mapping\Dateable' => 'cmsdoctrineorm_dateable_metadata_driver',
+                    'CmsDoctrineORM\Mapping\Translatable' => 'cmsdoctrineorm_translatable_metadata_driver',
+                ],
+            ],
+        ],
+        'entity_resolver' => [
+            'orm_default' => [
+                'resolvers' => [
+                    'CmsDoctrine\Mapping\Translatable\TranslationInterface'
+                        => 'CmsDoctrineORM\Mapping\Translatable\Translation',
+                    'Gedmo\Translatable\Entity\Translation'
+                        => 'CmsDoctrineORM\Mapping\Translatable\Translation',
                 ],
             ],
         ],
@@ -67,23 +76,44 @@ return [
                         => 'CmsDoctrine\Mapping\Relation\RelationSubscriber',
                     'CmsDoctrine\Mapping\Metadatable\MetadatableSubscriber'
                         => 'CmsDoctrine\Mapping\Metadatable\MetadatableSubscriber',
-                    'CmsDoctrine\Mapping\Dateable\TimestampableSubscriber'
-                        => 'CmsDoctrine\Mapping\Dateable\TimestampableSubscriber',
                     'CmsDoctrine\Mapping\Hierarchy\HierarchySubscriber'
                         => 'CmsDoctrine\Mapping\Hierarchy\HierarchySubscriber',
-                    'Gedmo\Sluggable\SluggableListener'
-                        => 'Gedmo\Sluggable\SluggableListener',
+                    'CmsDoctrine\Mapping\Sluggable\SluggableSubscriber'
+                        => 'CmsDoctrine\Mapping\Sluggable\SluggableSubscriber',
                     'CmsDoctrine\Mapping\Translatable\TranslatableSubscriber'
                         => 'CmsDoctrine\Mapping\Translatable\TranslatableSubscriber',
+                    'CmsDoctrine\Mapping\Dateable\TimestampableSubscriber'
+                        => 'CmsDoctrine\Mapping\Dateable\TimestampableSubscriber',
+                    'CmsDoctrine\Mapping\Blameable\BlameableSubscriber'
+                        => 'CmsDoctrine\Mapping\Blameable\BlameableSubscriber',
+                ],
+            ],
+        ],
+        'formannotationbuilder' => [
+            'orm_default' => [
+                'cache' => 'array',
+                'listeners' => [
+                    'CmsDoctrine\Form\Annotation\ElementResolverListener'
+                        => 'CmsDoctrine\Form\Annotation\ElementResolverListener',
                 ],
             ],
         ],
     ],
     'doctrine_factories' => [
-        'entitymanager' => 'CmsDoctrineORM\Service\EntityManagerFactory',
-        'discriminator_map' => 'CmsDoctrineORM\Service\DiscriminatorMapFactory',
+        'configuration' => 'CmsDoctrineORM\Factory\ConfigurationFactory',
+        'discriminator_map' => 'CmsDoctrineORM\Factory\DiscriminatorMapFactory',
+        'entitymanager' => 'CmsDoctrineORM\Factory\EntityManagerFactory',
+        'formannotationbuilder' => 'CmsDoctrineORM\Factory\Form\AnnotationBuilderFactory',
     ],
     'form_elements' => [
+        'factories' => [
+            'DoctrineModule\Form\Element\ObjectMultiCheckbox'
+                => 'CmsDoctrineORM\Factory\Form\ObjectMultiCheckboxFactory',
+            'DoctrineModule\Form\Element\ObjectRadio'
+                => 'CmsDoctrineORM\Factory\Form\ObjectRadioFactory',
+            'DoctrineModule\Form\Element\ObjectSelect'
+                => 'CmsDoctrineORM\Factory\Form\ObjectSelectFactory',
+        ],
         'abstract_factories' => [
             'CmsDoctrineORM\Form\Annotation\FormAbstractServiceFactory'
                 => 'CmsDoctrineORM\Form\Annotation\FormAbstractServiceFactory',
@@ -99,10 +129,6 @@ return [
                 => 'CmsDoctrineORM\Factory\DoctrineObjectHydratorFactory'
         ],
     ],
-    'listeners' => [
-        'CmsDoctrineORM\Event\TablePrefixListener'
-            => 'CmsDoctrineORM\Event\TablePrefixListener',
-    ],
     'mappers' => [
         'abstract_factories' => [
             'CmsDoctrineORM\Persistence\MapperAbstractServiceFactory'
@@ -114,9 +140,11 @@ return [
         ],
     ],
     'service_manager' => [
+        'factories' => [
+            'Doctrine\ORM\FormAnnotationBuilder'
+                => 'CmsDoctrineORM\Factory\Form\AnnotationBuilderAliasCompatFactory',
+        ],
         'invokables' => [
-            'CmsDoctrineORM\Event\TablePrefixListener'
-                => 'CmsDoctrineORM\Event\TablePrefixListener',
             'CmsDoctrineORM\Mapping\DefaultNamingStrategy'
                 => 'CmsDoctrineORM\Mapping\DefaultNamingStrategy',
         ],

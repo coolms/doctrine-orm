@@ -1,6 +1,6 @@
 <?php
 /**
- * CoolMS2 Doctrine ORM module (http://www.coolms.com/)
+ * CoolMS2 Doctrine ORM Module (http://www.coolms.com/)
  *
  * @link      http://github.com/coolms/doctrine-orm for the canonical source repository
  * @copyright Copyright (c) 2006-2015 Altgraphic, ALC (http://www.altgraphic.com)
@@ -172,25 +172,27 @@ trait EntityRepositoryTrait
     public function findByQueryBuilder(array $criteria, array $orderBy = null, $limit = null, $offset = null)
     {
         $qb = $this->createQueryBuilder('entity');
-        
-        $expr = $this->buildExpr($qb, $qb->expr()->andX(), $criteria);
+
+        $expr = $this->buildExpr($qb, $qb->expr()->andX(), $criteria, $this->getClassMetadata());
         if ($expr->count()) {
             $qb->where($expr);
         }
-        
+
         if (null !== $orderBy) {
-            $expr = $this->buildOrderByExpr($qb, null, array_keys($orderBy), array_values($orderBy));
+            $expr = $this->buildOrderByExpr($qb, null, array_keys($orderBy), array_values($orderBy), $this->getClassMetadata());
             if ($expr->count()) {
                 $qb->orderBy($expr);
             }
         }
+
         if (null !== $limit) {
             $qb->setMaxResults($limit);
         }
+
         if (null !== $offset) {
             $qb->setFirstResult($offset);
         }
-        
+
         return $qb;
     }
 

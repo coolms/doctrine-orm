@@ -10,7 +10,8 @@
 
 namespace CmsDoctrineORM\Query;
 
-use Doctrine\ORM\Query\Expr\Composite as CompositeExpression,
+use Doctrine\ORM\Mapping\ClassMetadata,
+    Doctrine\ORM\Query\Expr\Composite as CompositeExpression,
     Doctrine\ORM\Query\Expr\OrderBy as OrderByExpression,
     Doctrine\ORM\QueryBuilder;
 
@@ -54,9 +55,10 @@ trait ExpressionBuilderTrait
      * @param QueryBuilder $qb
      * @param CompositeExpression $expr
      * @param array $criteria
+     * @param ClassMetadata
      * @return CompositeExpression
      */
-    protected function buildExpr(QueryBuilder $qb, CompositeExpression $expr, array $criteria)
+    protected function buildExpr(QueryBuilder $qb, CompositeExpression $expr, array $criteria, ClassMetadata $meta)
     {
         if (!$criteria) {
             return $expr;
@@ -67,30 +69,45 @@ trait ExpressionBuilderTrait
                 $expr->add($this->buildExpr(
                     $qb,
                     $qb->expr()->orX(),
-                    $comparison
+                    $comparison,
+                    $meta
                 ));
             } elseif ($expression === 'and') {
                 $expr->add($this->buildExpr(
                     $qb,
                     $qb->expr()->andX(),
-                    $comparison
+                    $comparison,
+                    $meta
                 ));
             } else {
                 $comparison = $this->formatComparison($comparison, $expression, $qb);
                 list($field, $operator, $value) = $comparison;
+
                 if (null === $field && null === $operator) {
                     $expr->add($value);
                 } else {
+                    $alias = '';
                     $param = str_replace('.', '_', $field);
-                    if (!is_callable([$qb->expr(), $operator])) {
-                        $expr->add("$field $operator :$param");
-                    } else {
-                        if (strpos($field, '.') === false) {
-                            $rootAlias  = $qb->getRootAlias();
-                            $field      = "$rootAlias.$field";
+
+                    $rootAlias  = $qb->getRootAlias();
+                    if ($meta->hasAssociation($field)) {
+                        $type = $meta->getAssociationMapping($field)['type'];
+                        if ($type & $meta::TO_MANY) {
+                            $alias = "{$rootAlias}_$field";
+                            $qb->join("$rootAlias.$field", $alias);
                         }
-                        $expr->add($qb->expr()->{$operator}($field, ":$param"));
                     }
+
+                    if (!is_callable([$qb->expr(), $operator])) {
+                        $expr->add(($alias ?: $field) . " $operator :$param");
+                    } else {
+                        if (!$alias) {
+                            $alias = strpos($field, '.') === false ? "$rootAlias.$field" : $field;
+                        }
+
+                        $expr->add($qb->expr()->{$operator}($alias, ":$param"));
+                    }
+
                     $qb->setParameter($param, $value);
                 }
             }
@@ -104,10 +121,11 @@ trait ExpressionBuilderTrait
      * @param OrderByExpression $expr
      * @param array|string $orderBy
      * @param array|string $direction
+     * @param ClassMetadata $meta
      * @return self
      */
     protected function buildOrderByExpr(QueryBuilder $qb, OrderByExpression $expr = null,
-        $orderBy = null, $direction = null)
+        $orderBy = null, $direction = null, ClassMetadata $meta)
     {
         if (null === $orderBy) {
             return;

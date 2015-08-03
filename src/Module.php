@@ -10,8 +10,7 @@
 
 namespace CmsDoctrineORM;
 
-use Zend\EventManager\EventInterface,
-    Zend\ModuleManager\Feature\AutoloaderProviderInterface,
+use Zend\ModuleManager\Feature\AutoloaderProviderInterface,
     Zend\ModuleManager\Feature\ConfigProviderInterface,
     Zend\ModuleManager\Feature\InitProviderInterface,
     Zend\ModuleManager\ModuleEvent,
@@ -30,15 +29,16 @@ class Module implements
     {
         $moduleManager->loadModule('DoctrineModule');
         $moduleManager->loadModule('DoctrineORMModule');
+        $moduleManager->loadModule('CmsDoctrine');
 
         $em = $moduleManager->getEventManager();
-        $em->attach(ModuleEvent::EVENT_MERGE_CONFIG, [$this, 'onMergeConfig']);
+        $em->attach(ModuleEvent::EVENT_LOAD_MODULES_POST, [$this, 'onPostLoadModules']);
     }
 
     /**
      * @param ModuleEvent $e
      */
-    public function onMergeConfig(ModuleEvent $e)
+    public function onPostLoadModules(ModuleEvent $e)
     {
         $configListener = $e->getConfigListener();
         $config         = $configListener->getMergedConfig(false);

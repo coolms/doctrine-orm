@@ -1,6 +1,6 @@
 <?php
 /**
- * CoolMS2 Doctrine ORM module (http://www.coolms.com/)
+ * CoolMS2 Doctrine ORM Module (http://www.coolms.com/)
  *
  * @link      http://github.com/coolms/doctrine-orm for the canonical source repository
  * @copyright Copyright (c) 2006-2015 Altgraphic, ALC (http://www.altgraphic.com)
@@ -11,89 +11,88 @@
 namespace CmsDoctrineORM\Mapping\Hierarchy\MappedSuperclass;
 
 use Zend\Form\Annotation as Form,
-    Doctrine\ORM\Mapping as ORM,
-    Gedmo\Mapping\Annotation as Gedmo;
+    Doctrine\ORM\Mapping as ORM;
 
 /**
  * Nested tree hierarchy representation
- * 
- * @Gedmo\Tree(type="nested")
+ *
  * @ORM\MappedSuperclass(repositoryClass="CmsDoctrineORM\Mapping\Hierarchy\Repository\NestedTreeRepository")
+ * @ORM\Tree(type="nested")
  */
 abstract class AbstractNestedTree extends AbstractHierarchy
 {
     /**
      * @var int
-     * 
-     * @Gedmo\TreeLeft
+     *
      * @ORM\Column(name="lft",type="integer")
+     * @ORM\TreeLeft
      * @Form\Exclude()
      */
-    protected $lft;
+    protected $left;
 
     /**
      * @var int
-     * 
-     * @Gedmo\TreeRight
+     *
      * @ORM\Column(name="rgt",type="integer")
+     * @ORM\TreeRight
      * @Form\Exclude()
      */
-    protected $rgt;
+    protected $right;
 
     /**
      * @var int
-     * 
-     * @Gedmo\TreeLevel
+     *
      * @ORM\Column(name="lvl",type="integer")
+     * @ORM\TreeLevel
      * @Form\Exclude()
      */
-    protected $lvl;
+    protected $level;
 
     /**
-     * @param number $lft
+     * @param number $left
      */
-    public function setLft($lft)
+    public function setLeft($left)
     {
-    	$this->lft = $lft;
+    	$this->left = $left;
     }
 
     /**
      * @return number
      */
-    public function getLft()
+    public function getLeft()
     {
-    	return $this->lft;
+    	return $this->left;
     }
 
     /**
-     * @param number $rgt
+     * @param number $right
      */
-    public function setRgt($rgt)
+    public function setRight($right)
     {
-    	$this->rgt = $rgt;
-    }
-
-    /**
-     * @return number
-     */
-    public function getRgt()
-    {
-    	return $this->rgt;
-    }
-
-    /**
-     * @param number $lvl
-     */
-    public function setLvl($lvl)
-    {
-        $this->lvl = $lvl;
+    	$this->right = $right;
     }
 
     /**
      * @return number
      */
-    public function getLvl()
+    public function getRight()
     {
-        return $this->lvl;
+    	return $this->right;
+    }
+
+    /**
+     * @param number $level
+     */
+    public function setLevel($level)
+    {
+        $this->level = $level;
+    }
+
+    /**
+     * @return number
+     */
+    public function getLevel()
+    {
+        return $this->level;
     }
 }

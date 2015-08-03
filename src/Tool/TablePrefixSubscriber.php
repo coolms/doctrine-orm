@@ -8,12 +8,9 @@
  * @author    Dmitry Popov <d.popov@altgraphic.com>
  */
 
-namespace CmsDoctrineORM\Event;
+namespace CmsDoctrineORM\Tool;
 
-use Zend\EventManager\AbstractListenerAggregate,
-    Zend\EventManager\EventManagerInterface,
-    Zend\Mvc\MvcEvent,
-    Doctrine\Common\EventArgs,
+use Doctrine\Common\EventArgs,
     Doctrine\Common\EventSubscriber,
     Doctrine\ORM\Events,
     Doctrine\ORM\Mapping\ClassMetadataInfo;
@@ -21,12 +18,12 @@ use Zend\EventManager\AbstractListenerAggregate,
 /**
  * @author Dmitry Popov <d.popov@altgraphic.com>
  */
-class TablePrefixListener extends AbstractListenerAggregate implements EventSubscriber
+class TablePrefixSubscriber implements EventSubscriber
 {
     /**
      * @var string
      */
-    protected $prefix = 'cms_';
+    protected $prefix;
 
     /**
      * __construct
@@ -43,27 +40,6 @@ class TablePrefixListener extends AbstractListenerAggregate implements EventSubs
     /**
      * {@inheritDoc}
      */
-    public function attach(EventManagerInterface $events)
-    {
-        $this->listeners[] = $events->attach(MvcEvent::EVENT_BOOTSTRAP, [$this, 'onBootstrap'], PHP_INT_MAX);
-    }
-
-    /**
-     * Event callback to be triggered on bootstrap
-     *
-     * @param MvcEvent $e
-     */
-    public function onBootstrap(MvcEvent $e)
-    {
-        $services = $e->getApplication()->getServiceManager();
-        /* @var $om \Doctrine\ORM\EntityManager */
-        $om = $services->get('Doctrine\\ORM\\EntityManager');
-        $om->getEventManager()->addEventSubscriber($this);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function getSubscribedEvents()
     {
         return [Events::loadClassMetadata];
@@ -75,7 +51,14 @@ class TablePrefixListener extends AbstractListenerAggregate implements EventSubs
     public function loadClassMetadata(EventArgs $eventArgs)
     {
         $classMetadata = $eventArgs->getClassMetadata();
-        $classMetadata->setTableName($this->prefix . $classMetadata->getTableName());
+
+        // If the entity is a subclass with STI, it gets its already prefixed table from inherited class
+        if (!$classMetadata->isInheritanceTypeSingleTable() ||
+            $classMetadata->getName() === $classMetadata->rootEntityName
+        ) {
+            $classMetadata->setTableName($this->prefix.$classMetadata->getTableName());
+        }
+
         foreach ($classMetadata->getAssociationMappings() as $fieldName => $mapping) {
             if ($mapping['type'] == ClassMetadataInfo::MANY_TO_MANY
                 && isset($classMetadata->associationMappings[$fieldName]['joinTable']['name'])

@@ -1,6 +1,6 @@
 <?php
 /**
- * CoolMS2 Doctrine ORM module (http://www.coolms.com/)
+ * CoolMS2 Doctrine ORM Module (http://www.coolms.com/)
  *
  * @link      http://github.com/coolms/doctrine-orm for the canonical source repository
  * @copyright Copyright (c) 2006-2015 Altgraphic, ALC (http://www.altgraphic.com)
@@ -14,9 +14,9 @@ trait ContentableTrait
 {
     /**
      * @var string
-     * 
-     * @Gedmo\Translatable
+     *
      * @ORM\Column(type="text",length=4294967295,nullable=true)
+     * @ORM\Translatable
      * @Form\Type("Textarea")
      * @Form\Filter({"name":"StringTrim"})
      * @Form\Filter({"name":"Null"})
@@ -32,8 +32,8 @@ trait ContentableTrait
      * @Form\Attributes({"required":false})
      * @Form\Options({
      *      "label":"Content",
-     *      "translator_text_domain":"default",
-     *      })
+     *      "text_domain":"default"})
+     * @Form\Flags({"priority":700})
      */
     protected $content;
 

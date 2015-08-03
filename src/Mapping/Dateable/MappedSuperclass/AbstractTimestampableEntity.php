@@ -1,6 +1,6 @@
 <?php
 /**
- * CoolMS2 Doctrine ORM module (http://www.coolms.com/)
+ * CoolMS2 Doctrine ORM Module (http://www.coolms.com/)
  *
  * @link      http://github.com/coolms/doctrine-orm for the canonical source repository
  * @copyright Copyright (c) 2006-2015 Altgraphic, ALC (http://www.altgraphic.com)
@@ -10,9 +10,8 @@
 
 namespace CmsDoctrineORM\Mapping\Dateable\MappedSuperclass;
 
-use Zend\Form\Annotation as Form,
-    Doctrine\ORM\Mapping as ORM,
-    Gedmo\Mapping\Annotation as Gedmo,
+use Doctrine\ORM\Mapping as ORM,
+    Zend\Form\Annotation as Form,
     CmsCommon\Mapping\Dateable\TimestampableInterface,
     CmsDoctrineORM\Mapping\Common\MappedSuperclass\AbstractIdentifiableEntity,
     CmsDoctrineORM\Mapping\Dateable\Traits\TimestampableTrait;
@@ -21,7 +20,7 @@ use Zend\Form\Annotation as Form,
  * Abstract timestampable entity
  *
  * @ORM\MappedSuperclass
- * @Form\Hydrator("DoctrineModule\Stdlib\Hydrator\DoctrineObject")
+ * @Form\Exclude()
  */
 abstract class AbstractTimestampableEntity extends AbstractIdentifiableEntity implements TimestampableInterface
 {

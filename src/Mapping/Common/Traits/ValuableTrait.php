@@ -1,6 +1,6 @@
 <?php
 /**
- * CoolMS2 Doctrine ORM module (http://www.coolms.com/)
+ * CoolMS2 Doctrine ORM Module (http://www.coolms.com/)
  *
  * @link      http://github.com/coolms/doctrine-orm for the canonical source repository
  * @copyright Copyright (c) 2006-2015 Altgraphic, ALC (http://www.altgraphic.com)
@@ -12,14 +12,14 @@ namespace CmsDoctrineORM\Mapping\Common\Traits;
 
 /**
  * Trait for the entity to have a value
- * 
+ *
  * @author Dmitry Popov <d.popov@altgraphic.com>
  */
 trait ValuableTrait
 {
     /**
      * @var string
-     * 
+     *
      * @ORM\Column(type="string",length=255,nullable=false)
      * @Form\Type("Text")
      * @Form\Filter({"name":"StripTags"})
@@ -36,8 +36,8 @@ trait ValuableTrait
      * @Form\Attributes({"required":true})
      * @Form\Options({
      *      "label":"Value",
-     *      "translator_text_domain":"default",
-     *      })
+     *      "text_domain":"default"})
+     * @Form\Flags({"priority":750})
      */
     protected $value;
 

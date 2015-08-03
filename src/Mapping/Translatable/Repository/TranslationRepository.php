@@ -1,6 +1,6 @@
 <?php
 /**
- * CoolMS2 Doctrine ORM module (http://www.coolms.com/)
+ * CoolMS2 Doctrine ORM Module (http://www.coolms.com/)
  *
  * @link      http://github.com/coolms/doctrine-orm for the canonical source repository
  * @copyright Copyright (c) 2006-2015 Altgraphic, ALC (http://www.altgraphic.com)
@@ -10,12 +10,12 @@
 
 namespace CmsDoctrineORM\Mapping\Translatable\Repository;
 
-use Gedmo\Translatable\Entity\Repository\TranslationRepository as GedmoTranslationRepository;
+use Gedmo\Translatable\Entity\Repository\TranslationRepository as BaseTranslationRepository;
 
 /**
  * Class TranslationRepository
  */
-class TranslationRepository extends GedmoTranslationRepository
+class TranslationRepository extends BaseTranslationRepository
 {
     
 }

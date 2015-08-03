@@ -8,28 +8,26 @@
  * @author    Dmitry Popov <d.popov@altgraphic.com>
  */
 
-namespace CmsDoctrineORM\Mapping\Dateable\Entity;
+namespace CmsDoctrineORM\Mapping\Dateable;
 
 use DateTime,
-    Zend\Form\Annotation as Form,
     Doctrine\ORM\Mapping as ORM,
-    CmsCommon\Mapping\Dateable\RangeableInterface,
-    CmsDoctrineORM\Mapping\Dateable\Traits\RangeableTrait;
+    Zend\Form\Annotation as Form,
+    CmsCommon\Mapping\Dateable\RangeableInterface;
 
 /**
  * @ORM\Embeddable
  * @Form\Name("dateRange")
- * @Form\Instance("CmsDoctrineORM\Mapping\Dateable\Entity\DateSelectRange")
+ * @Form\Instance("CmsDoctrineORM\Mapping\Dateable\DateSelectRange")
  * @Form\Hydrator("DoctrineModule\Stdlib\Hydrator\DoctrineObject")
  * @Form\Type("DateSelectRange")
  * @Form\Options({
  *      "create_empty_option":true,
- *      "label":"Select date range",
- *      })
+ *      "label":"Select date range"})
  */
 class DateSelectRange implements RangeableInterface
 {
-    use RangeableTrait;
+    use Traits\RangeableTrait;
 
     /**
      * __construct
@@ -39,7 +37,7 @@ class DateSelectRange implements RangeableInterface
      */
     public function __construct($startDate = null, $endDate = null)
     {
-        $this->setStartDate(new DateTime($startDate));
-        $this->setEndDate(new DateTime($endDate));
+        $this->setStartDate($startDate);
+        $this->setEndDate($endDate);
     }
 }

@@ -10,9 +10,12 @@
 
 namespace CmsDoctrineORM\Options;
 
-use Zend\Stdlib\AbstractOptions;
+use DoctrineORMModule\Options\Configuration as DoctrineORMConfiguration;
 
-class DiscriminatorMap extends AbstractOptions
+/**
+ * Configuration options for an ORM Configuration
+ */
+class Configuration extends DoctrineORMConfiguration
 {
     /**
      * Set the configuration key for the EventManager. Event manager key
@@ -24,11 +27,11 @@ class DiscriminatorMap extends AbstractOptions
     protected $eventManager = 'orm_default';
 
     /**
-     * An array that maps an discriminator entry (type) to class name
+     * Table prefix
      *
-     * @var array
+     * @var string
      */
-    protected $maps = [];
+    protected $tablePrefix = 'cms_';
 
     /**
      * @param  string $eventManager
@@ -49,23 +52,20 @@ class DiscriminatorMap extends AbstractOptions
     }
 
     /**
-     * @param  array $maps
+     * @param  string $tablePrefix
      * @return self
      */
-    public function setMaps(array $maps)
+    public function setTablePrefix($tablePrefix)
     {
-        foreach ($maps as $entity => $map) {
-            $this->maps[$entity] = (array) $map;
-        }
-
+        $this->tablePrefix = $tablePrefix;
         return $this;
     }
 
     /**
-     * @return array
+     * @return string
      */
-    public function getMaps()
+    public function getTablePrefix()
     {
-        return $this->maps;
+        return $this->tablePrefix;
     }
 }

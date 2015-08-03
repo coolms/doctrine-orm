@@ -1,6 +1,6 @@
 <?php
 /**
- * CoolMS2 Doctrine ORM module (http://www.coolms.com/)
+ * CoolMS2 Doctrine ORM Module (http://www.coolms.com/)
  *
  * @link      http://github.com/coolms/doctrine-orm for the canonical source repository
  * @copyright Copyright (c) 2006-2015 Altgraphic, ALC (http://www.altgraphic.com)
@@ -15,16 +15,16 @@ use Doctrine\Common\Collections\ArrayCollection,
     CmsCommon\Mapping\Hierarchy\HierarchyInterface;
 
 /**
- * Trait for the entity to be a part of the hierarchy
- * 
+ * Trait for the entity/document to be a part of the hierarchy
+ *
  * @author Dmitry Popov <d.popov@altgraphic.com>
  */
 trait HierarchyTrait
 {
     /**
      * @var HierarchyInterface
-     * 
-     * @Gedmo\TreeParent
+     *
+     * @ORM\TreeParent
      */
     protected $parent;
 

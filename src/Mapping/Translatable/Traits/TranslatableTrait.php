@@ -12,28 +12,31 @@ namespace CmsDoctrineORM\Mapping\Translatable\Traits;
 
 use Doctrine\Common\Collections\ArrayCollection,
     Doctrine\Common\Collections\Collection,
-    CmsDoctrineORM\Mapping\Translatable\MappedSuperclass\AbstractTranslation;
+    CmsDoctrine\Mapping\Translatable\TranslationInterface;
 
 trait TranslatableTrait
 {
     /**
-     * @var AbstractTranslation[]
+     * @var TranslationInterface[]
      *
      * @Form\Exclude()
      */
     protected $translations;
 
     /**
-     * @var string Used locale to override Translation listener's locale
-     * this is not a mapped field of entity metadata, just a simple property
+     * Used locale to override Translation listener's locale. 
+     * This is not a mapped field of entity metadata, just a simple property
      *
-     * @Gedmo\Locale
+     * @var string
+     *
+     * @ORM\Locale
      * @Form\Type("Select")
+     * @Form\Required(false)
      * @Form\Options({
      *      "label":"Language",
-     *      "text_domain":"default",
-     *      })
-     * @Form\Flags({"priority":100})
+     *      "empty_option":"Select Language",
+     *      "text_domain":"default"})
+     * @Form\Flags({"priority":950})
      */
     protected $locale;
 
@@ -48,7 +51,7 @@ trait TranslatableTrait
     }
 
     /**
-     * @param AbstractTranslation[] $translations
+     * @param TranslationInterface[] $translations
      */
     public function setTranslations($translations)
     {
@@ -57,7 +60,7 @@ trait TranslatableTrait
     }
 
     /**
-     * @param AbstractTranslation[] $translations
+     * @param TranslationInterface[] $translations
      */
     public function addTranslations($translations)
     {
@@ -67,9 +70,9 @@ trait TranslatableTrait
     }
 
     /**
-     * @param AbstractTranslation $translation
+     * @param TranslationInterface $translation
      */
-    public function addTranslation(AbstractTranslation $translation)
+    public function addTranslation(TranslationInterface $translation)
     {
         if (!$this->getTranslations()->contains($translation)) {
             $this->getTranslations()->add($translation);
@@ -78,7 +81,7 @@ trait TranslatableTrait
     }
 
     /**
-     * @param AbstractTranslation[] $translations
+     * @param TranslationInterface[] $translations
      */
     public function removeTranslations($translations)
     {
@@ -88,9 +91,9 @@ trait TranslatableTrait
     }
 
     /**
-     * @param AbstractTranslation $translation
+     * @param TranslationInterface $translation
      */
-    public function removeTranslation(AbstractTranslation $translation)
+    public function removeTranslation(TranslationInterface $translation)
     {
         $this->getTranslations()->removeElement($translation);
     }
@@ -112,15 +115,11 @@ trait TranslatableTrait
     }
 
     /**
-     * @param string|\CmsLocale\Mapping\LocaleInterface $locale
+     * @param string $locale
      */
     public function setTranslatableLocale($locale)
     {
-        if ($locale instanceof \CmsLocale\Mapping\LocaleInterface) {
-            $locale = $locale->getCanonicalName();
-        }
-
-        $this->locale = $locale;
+        $this->locale = (string) $locale;
     }
 
     /**

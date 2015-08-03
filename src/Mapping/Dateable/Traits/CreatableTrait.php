@@ -1,6 +1,6 @@
 <?php
 /**
- * CoolMS2 Doctrine ORM module (http://www.coolms.com/)
+ * CoolMS2 Doctrine ORM Module (http://www.coolms.com/)
  *
  * @link      http://github.com/coolms/doctrine-orm for the canonical source repository
  * @copyright Copyright (c) 2006-2015 Altgraphic, ALC (http://www.altgraphic.com)
@@ -17,13 +17,12 @@ trait CreatableTrait
     /**
      * @var DateTime
      *
-     * @Gedmo\Timestampable(on="create")
      * @ORM\Column(type="datetime",nullable=false)
+     * @ORM\Timestampable(on="create")
      * @Form\Type("StaticElement")
      * @Form\Options({
      *      "label":"Created at",
-     *      "translator_text_domain":"default",
-     *      })
+     *      "text_domain":"default"})
      * @Form\Flags({"priority":-890})
      */
     protected $createdAt;

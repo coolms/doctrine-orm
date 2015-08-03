@@ -1,6 +1,6 @@
 <?php
 /**
- * CoolMS2 Doctrine ORM module (http://www.coolms.com/)
+ * CoolMS2 Doctrine ORM Module (http://www.coolms.com/)
  *
  * @link      http://github.com/coolms/doctrine-orm for the canonical source repository
  * @copyright Copyright (c) 2006-2015 Altgraphic, ALC (http://www.altgraphic.com)
@@ -13,14 +13,14 @@ namespace CmsDoctrineORM\Mapping\Translatable\MappedSuperclass;
 use Zend\Form\Annotation as Form,
     Doctrine\ORM\Mapping as ORM,
     Gedmo\Translatable\Entity\MappedSuperclass\AbstractPersonalTranslation,
-    CmsCommon\Mapping\Common\ObjectableInterface;
+    CmsDoctrine\Mapping\Translatable\TranslationInterface;
 
 /**
  * Abstract translation class
  *
  * @ORM\MappedSuperclass(repositoryClass="CmsDoctrineORM\Mapping\Translatable\Repository\TranslationRepository")
  */
-abstract class AbstractTranslation extends AbstractPersonalTranslation implements ObjectableInterface
+abstract class AbstractTranslation extends AbstractPersonalTranslation implements TranslationInterface
 {
     /**
      * @var string
@@ -50,5 +50,13 @@ abstract class AbstractTranslation extends AbstractPersonalTranslation implement
         $this->setLocale($locale);
         $this->setField($field);
         $this->setContent($content);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
     }
 }

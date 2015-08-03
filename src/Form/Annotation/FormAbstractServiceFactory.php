@@ -12,10 +12,9 @@ namespace CmsDoctrineORM\Form\Annotation;
 
 use Zend\ServiceManager\AbstractPluginManager,
     Zend\ServiceManager\ServiceLocatorInterface,
-    Doctrine\ORM\EntityManager,
-    CmsCommon\Form\Annotation\FormAbstractServiceFactory as AnnotationFormAbstractServiceFactory;
+    CmsCommon\Form\Annotation\FormAbstractServiceFactory as CommonFormAbstractServiceFactory;
 
-class FormAbstractServiceFactory extends AnnotationFormAbstractServiceFactory
+class FormAbstractServiceFactory extends CommonFormAbstractServiceFactory
 {
     /**
      * {@inheritDoc}
@@ -27,34 +26,15 @@ class FormAbstractServiceFactory extends AnnotationFormAbstractServiceFactory
         }
 
         $services = $formElements->getServiceLocator();
-
-        return !$this->getObjectManager($services)->getMetadataFactory()->isTransient($requestedName);
+        $om = $this->getAnnotationBuilder($services)->getObjectManager();
+        return !$om->getMetadataFactory()->isTransient($requestedName);
     }
 
     /**
-     * {@inheritDoc}
+     * @return AnnotationBuilder
      */
     protected function getAnnotationBuilder(ServiceLocatorInterface $services)
     {
-        if (null === $this->annotationBuilder) {
-            $om = $this->getObjectManager($services);
-            $cacheStorage = $this->getAnnotationBuilderCache($services);
-
-            $this->annotationBuilder = new AnnotationBuilder($om, $cacheStorage);
-
-            $em = $this->annotationBuilder->getEventManager();
-            $em->attach(new ElementResolverListener($om));
-        }
-
-        return $this->annotationBuilder;
-    }
-
-    /**
-     * @param ServiceLocatorInterface $services
-     * @return EntityManager
-     */
-    protected function getObjectManager(ServiceLocatorInterface $services)
-    {
-        return $services->get('Doctrine\\ORM\\EntityManager');
+        return $services->get('Doctrine\\ORM\\FormAnnotationBuilder');
     }
 }

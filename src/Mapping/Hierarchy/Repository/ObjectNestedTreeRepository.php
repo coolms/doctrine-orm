@@ -1,6 +1,6 @@
 <?php
 /**
- * CoolMS2 Doctrine ORM module (http://www.coolms.com/)
+ * CoolMS2 Doctrine ORM Module (http://www.coolms.com/)
  *
  * @link      http://github.com/coolms/doctrine-orm for the canonical source repository
  * @copyright Copyright (c) 2006-2015 Altgraphic, ALC (http://www.altgraphic.com)
@@ -30,10 +30,10 @@ class ObjectNestedTreeRepository extends NestedTreeRepository
         $qb = $this->createQueryBuilder('node');
         $qb->addSelect('object')
            ->innerJoin('node.object', 'object')
-           ->where($this->buildExpr($qb, $qb->expr()->andX(), $criteria));
+           ->where($this->buildExpr($qb, $qb->expr()->andX(), $criteria, $this->getClassMetadata()));
 
         if (null !== $orderBy) {
-            $qb->orderBy($this->buildOrderByExpr($qb, null, $orderBy));
+            $qb->orderBy($this->buildOrderByExpr($qb, null, $orderBy, null, $this->getClassMetadata()));
         }
         if (null !== $limit) {
             $qb->setMaxResults($limit);
@@ -67,11 +67,11 @@ class ObjectNestedTreeRepository extends NestedTreeRepository
            ->innerJoin('node.object', 'object');
 
         if (!empty($options['criteria'])) {
-            $qb->andWhere($this->buildExpr($qb, $qb->expr()->andX(), $options['criteria']));
+            $qb->andWhere($this->buildExpr($qb, $qb->expr()->andX(), $options['criteria'], $this->getClassMetadata()));
         }
 
         if (null !== $orderBy) {
-            $qb->orderBy($this->buildOrderByExpr($qb, null, $orderBy, $direction));
+            $qb->orderBy($this->buildOrderByExpr($qb, null, $orderBy, $direction, $this->getClassMetadata()));
         }
 
         return $qb;
