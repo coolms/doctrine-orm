@@ -30,14 +30,16 @@ class ObjectNestedTreeRepository extends NestedTreeRepository
         $qb = $this->createQueryBuilder('node');
         $qb->addSelect('object')
            ->innerJoin('node.object', 'object')
-           ->where($this->buildExpr($qb, $qb->expr()->andX(), $criteria, $this->getClassMetadata()));
+           ->where($this->buildExpr($qb, $qb->expr()->andX(), $criteria));
 
-        if (null !== $orderBy) {
-            $qb->orderBy($this->buildOrderByExpr($qb, null, $orderBy, null, $this->getClassMetadata()));
+        if ($orderBy) {
+            $qb->orderBy($this->buildOrderByExpr($qb, null, $orderBy, null));
         }
+
         if (null !== $limit) {
             $qb->setMaxResults($limit);
         }
+
         if (null !== $offset) {
             $qb->setFirstResult($offset);
         }

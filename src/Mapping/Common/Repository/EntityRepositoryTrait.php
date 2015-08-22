@@ -12,6 +12,8 @@ namespace CmsDoctrineORM\Mapping\Common\Repository;
 
 use Zend\Paginator\Paginator,
     Doctrine\ORM\AbstractQuery,
+    Doctrine\ORM\EntityManager,
+    Doctrine\ORM\Mapping\ClassMetadata,
     Doctrine\ORM\Tools\Pagination\Paginator as ORMPaginator,
     Doctrine\ORM\QueryBuilder,
     DoctrineORMModule\Paginator\Adapter\DoctrinePaginator as DoctrineAdapter,
@@ -22,14 +24,9 @@ trait EntityRepositoryTrait
     use ExpressionBuilderTrait;
 
     /**
-     * @return \Doctrine\ORM\EntityManager
+     * @return EntityManager
      */
     abstract public function getEntityManager();
-
-    /**
-     * @return \Doctrine\ORM\Mapping\ClassMetadata
-     */
-    abstract public function getClassMetadata();
 
     /**
      * @param string $alias
@@ -44,21 +41,63 @@ trait EntityRepositoryTrait
     abstract public function getClassName();
 
     /**
+     * @return ClassMetadata
+     */
+    public function getClassMetadata()
+    {
+        return $this->getEntityManager()->getClassMetadata($this->getClassName());
+    }
+
+    /**
+     * Since Doctrine closes the EntityManager after a Exception, we have to create
+     * a fresh copy (so it is possible to save logs in the current request)
+     */
+    private function recoverEntityManager()
+    {
+        $this->_em = EntityManager::create(
+            $this->getEntityManager()->getConnection(),
+            $this->getEntityManager()->getConfiguration()
+        );
+    }
+
+    /**
+     * Retrieves paginator for records
+     *
      * @param array $criteria
      * @param array $orderBy
+     * @param int $currentPageNumber
+     * @param int $itemCountPerPage
      * @return Paginator
      */
-    public function getPaginator(array $criteria = [], array $orderBy = null)
-    {
-        if (func_num_args() > 0) {
+    public function getPaginator(
+        array $criteria = [],
+        array $orderBy = [],
+        $currentPageNumber = null,
+        $itemCountPerPage = null
+    ) {
+        try {
+        if ($criteria || $orderBy) {
             $query = $this->findByQuery($criteria, $orderBy);
         } else {
             $query = $this->findAllQuery();
         }
 
-        $adapter = new DoctrineAdapter(new ORMPaginator($query));
+        $adapter    = new DoctrineAdapter(new ORMPaginator($query));
+        $paginator  = new Paginator($adapter);
 
-        return new Paginator($adapter);
+        if ($currentPageNumber) {
+            $paginator->setCurrentPageNumber($currentPageNumber);
+        }
+
+        if ($itemCountPerPage) {
+            $paginator->setItemCountPerPage($itemCountPerPage);
+        }
+
+        } catch (\Exception $e) {
+            var_dump($e->getTraceAsString());
+            exit;
+        }
+        return $paginator;
     }
 
     /**
@@ -173,13 +212,15 @@ trait EntityRepositoryTrait
     {
         $qb = $this->createQueryBuilder('entity');
 
-        $expr = $this->buildExpr($qb, $qb->expr()->andX(), $criteria, $this->getClassMetadata());
-        if ($expr->count()) {
-            $qb->where($expr);
+        if ($criteria) {
+            $expr = $this->buildExpr($qb, $qb->expr()->andX(), $criteria);
+            if ($expr->count()) {
+                $qb->where($expr);
+            }
         }
 
-        if (null !== $orderBy) {
-            $expr = $this->buildOrderByExpr($qb, null, array_keys($orderBy), array_values($orderBy), $this->getClassMetadata());
+        if ($orderBy) {
+            $expr = $this->buildOrderByExpr($qb, null, array_keys($orderBy), array_values($orderBy));
             if ($expr->count()) {
                 $qb->orderBy($expr);
             }

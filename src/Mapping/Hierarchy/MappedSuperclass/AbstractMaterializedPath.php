@@ -11,7 +11,8 @@
 namespace CmsDoctrineORM\Mapping\Hierarchy\MappedSuperclass;
 
 use Zend\Form\Annotation as Form,
-    Doctrine\ORM\Mapping as ORM;
+    Doctrine\ORM\Mapping as ORM,
+    CmsCommon\Mapping\Hierarchy\MaterializedPathInterface;
 
 /**
  * Materialized path hierarchy representation
@@ -19,17 +20,8 @@ use Zend\Form\Annotation as Form,
  * @ORM\MappedSuperclass(repositoryClass="CmsDoctrineORM\Mapping\Hierarchy\Repository\MaterializedPathRepository")
  * @ORM\Tree(type="materializedPath")
  */
-abstract class AbstractMaterializedPath extends AbstractHierarchy
+abstract class AbstractMaterializedPath extends AbstractHierarchy implements MaterializedPathInterface
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="lvl",type="integer",nullable=true)
-     * @ORM\TreeLevel
-     * @Form\Exclude()
-     */
-    protected $level;
-
     /**
      * @var string
      *
@@ -53,21 +45,5 @@ abstract class AbstractMaterializedPath extends AbstractHierarchy
     public function getPath()
     {
     	return $this->path;
-    }
-
-    /**
-     * @param number $level
-     */
-    public function setLevel($level)
-    {
-        $this->level = $level;
-    }
-
-    /**
-     * @return number
-     */
-    public function getLevel()
-    {
-        return $this->level;
     }
 }

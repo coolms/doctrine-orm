@@ -12,13 +12,11 @@ namespace CmsDoctrineORM\Mapping\Translatable\Repository;
 
 use Doctrine\ORM\AbstractQuery,
     Doctrine\ORM\QueryBuilder,
-    CmsDoctrineORM\Mapping\Common\Repository\EntityRepositoryTrait,
     CmsDoctrineORM\Query\TranslatableQueryProviderTrait;
 
 trait TranslatableRepositoryTrait
 {
-    use EntityRepositoryTrait,
-        TranslatableQueryProviderTrait;
+    use TranslatableQueryProviderTrait;
 
     /**
      * {@inheritDoc}

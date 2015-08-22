@@ -22,6 +22,15 @@ use Doctrine\Common\Collections\ArrayCollection,
 trait HierarchyTrait
 {
     /**
+     * @var int
+     *
+     * @ORM\Column(name="lvl",type="integer")
+     * @ORM\TreeLevel
+     * @Form\Exclude()
+     */
+    protected $level;
+
+    /**
      * @var HierarchyInterface
      *
      * @ORM\TreeParent
@@ -41,6 +50,22 @@ trait HierarchyTrait
     public function __construct()
     {
         $this->children = new ArrayCollection();
+    }
+
+    /**
+     * @param number $level
+     */
+    public function setLevel($level)
+    {
+        $this->level = $level;
+    }
+
+    /**
+     * @return number
+     */
+    public function getLevel()
+    {
+        return $this->level;
     }
 
     /**
@@ -119,6 +144,14 @@ trait HierarchyTrait
     public function hasChild(HierarchyInterface $child)
     {
         return $this->getChildren()->contains($child);
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasChildren()
+    {
+        return (bool) $this->getChildren()->count(); 
     }
 
     /**

@@ -11,7 +11,8 @@
 namespace CmsDoctrineORM\Mapping\Hierarchy\MappedSuperclass;
 
 use Zend\Form\Annotation as Form,
-    Doctrine\ORM\Mapping as ORM;
+    Doctrine\ORM\Mapping as ORM,
+    CmsCommon\Mapping\Hierarchy\NestedSetInterface;
 
 /**
  * Nested tree hierarchy representation
@@ -19,7 +20,7 @@ use Zend\Form\Annotation as Form,
  * @ORM\MappedSuperclass(repositoryClass="CmsDoctrineORM\Mapping\Hierarchy\Repository\NestedTreeRepository")
  * @ORM\Tree(type="nested")
  */
-abstract class AbstractNestedTree extends AbstractHierarchy
+abstract class AbstractNestedTree extends AbstractHierarchy implements NestedSetInterface
 {
     /**
      * @var int
@@ -38,15 +39,6 @@ abstract class AbstractNestedTree extends AbstractHierarchy
      * @Form\Exclude()
      */
     protected $right;
-
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="lvl",type="integer")
-     * @ORM\TreeLevel
-     * @Form\Exclude()
-     */
-    protected $level;
 
     /**
      * @param number $left
@@ -78,21 +70,5 @@ abstract class AbstractNestedTree extends AbstractHierarchy
     public function getRight()
     {
     	return $this->right;
-    }
-
-    /**
-     * @param number $level
-     */
-    public function setLevel($level)
-    {
-        $this->level = $level;
-    }
-
-    /**
-     * @return number
-     */
-    public function getLevel()
-    {
-        return $this->level;
     }
 }

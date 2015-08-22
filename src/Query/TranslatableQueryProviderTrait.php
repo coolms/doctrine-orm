@@ -47,7 +47,7 @@ trait TranslatableQueryProviderTrait
      * @param string       $locale A locale name
      * @return Query
      */
-    protected function getQuery(QueryBuilder $qb, $locale = null)
+    public function getQuery(QueryBuilder $qb, $locale = null)
     {
         $query  = $qb->getQuery();
         $locale = $locale ?: $this->getTranslatableLocale();
