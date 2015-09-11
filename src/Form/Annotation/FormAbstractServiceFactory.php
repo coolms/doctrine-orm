@@ -27,7 +27,25 @@ class FormAbstractServiceFactory extends CommonFormAbstractServiceFactory
 
         $services = $formElements->getServiceLocator();
         $om = $this->getAnnotationBuilder($services)->getObjectManager();
+        if (!class_exists($requestedName)) {
+            $requestedName = $om->getClassMetadata($requestedName)->getName();
+        }
+
         return !$om->getMetadataFactory()->isTransient($requestedName);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function createServiceWithName(ServiceLocatorInterface $formElements, $name, $requestedName)
+    {
+        $services = $formElements->getServiceLocator();
+        $om = $this->getAnnotationBuilder($services)->getObjectManager();
+        if (!class_exists($requestedName)) {
+            $requestedName = $om->getClassMetadata($requestedName)->getName();
+        }
+
+        return parent::createServiceWithName($formElements, $name, $requestedName);
     }
 
     /**
