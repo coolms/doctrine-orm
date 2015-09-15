@@ -24,11 +24,11 @@ trait IdentifiableTrait
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * @Form\Type("StaticElement")
-     * @Form\Required(true)
+     * @Form\Required(false)
      * @Form\AllowEmpty(true)
      * @Form\Options({
      *      "label":"Identifier",
-     *      "translator_text_domain":"default"})
+     *      "text_domain":"default"})
      * @Form\Flags({"priority":1000})
      */
     protected $id;
