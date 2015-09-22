@@ -23,7 +23,8 @@ use DateTime,
  * @Form\Type("DateSelectRange")
  * @Form\Options({
  *      "create_empty_option":true,
- *      "label":"Select date range"})
+ *      "label":"Select date range",
+ *      "text_domain":"default"})
  */
 class DateSelectRange implements RangeableInterface
 {

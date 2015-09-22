@@ -22,7 +22,7 @@ trait UpdatableTrait
      * @Form\Type("StaticElement")
      * @Form\Options({
      *      "label":"Updated at",
-     *      "translator_text_domain":"default"})
+     *      "text_domain":"default"})
      * @Form\Flags({"priority":-880})
      */
     protected $updatedAt;
