@@ -443,10 +443,25 @@ trait EntityRepositoryTrait
      */
     public function save($entity = null)
     {
+        $em = $this->getEntityManager();
         if (null !== $entity) {
             $this->guardEntity($entity);
+            $meta = $this->getClassMetadata();
+            $mappings = $meta->getAssociationNames();
+            foreach ($mappings as $name) {
+                if ($meta->isSingleValuedAssociation($name) && $meta->isAssociationInverseSide($name)) {
+                    $prop = $meta->getReflectionProperty($name);
+                    $prop->setAccessible(true);
+                    if ($assocValue = $prop->getValue($entity)) {
+                        $em->getUnitOfWork()->recomputeSingleEntityChangeSet($em->getClassMetadata(get_class($assocValue)), $assocValue);
+                        if ($em->getUnitOfWork()->isScheduledForUpdate($assocValue)) {
+                            $em->flush($assocValue);
+                        }
+                    }
+                }
+            }
         }
-        $em = $this->getEntityManager();
+
         $em->flush($entity);
     }
 
