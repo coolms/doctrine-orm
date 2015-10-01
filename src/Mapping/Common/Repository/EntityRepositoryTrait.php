@@ -448,15 +448,24 @@ trait EntityRepositoryTrait
             $this->guardEntity($entity);
             $meta = $this->getClassMetadata();
             $mappings = $meta->getAssociationNames();
+            $uow = $em->getUnitOfWork();
+            $isChangeSetsComputed = false;
             foreach ($mappings as $name) {
-                if ($meta->isSingleValuedAssociation($name) && $meta->isAssociationInverseSide($name)) {
+                if ($meta->isAssociationInverseSide($name)) {
                     $prop = $meta->getReflectionProperty($name);
                     $prop->setAccessible(true);
-                    if ($assocValue = $prop->getValue($entity)) {
-                        $em->getUnitOfWork()->recomputeSingleEntityChangeSet($em->getClassMetadata(get_class($assocValue)), $assocValue);
+                    if (!($assocValue = $prop->getValue($entity))) {
+                        continue;
+                    }
+
+                    if ($meta->isSingleValuedAssociation($name)) {
+                        $uow->recomputeSingleEntityChangeSet($em->getClassMetadata(get_class($assocValue)), $assocValue);
                         if ($em->getUnitOfWork()->isScheduledForUpdate($assocValue)) {
                             $em->flush($assocValue);
                         }
+                    } elseif (!$isChangeSetsComputed) {
+                        $uow->computeChangeSets();
+                        $isChangeSetsComputed = true;
                     }
                 }
             }
