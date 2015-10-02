@@ -33,8 +33,8 @@ class DateSelectRange implements RangeableInterface
     /**
      * __construct
      *
-     * @param string|int|DateTime $startDate
-     * @param string|int|DateTime $endDate
+     * @param string|int|null|DateTime $startDate
+     * @param string|int|null|DateTime $endDate
      */
     public function __construct($startDate = null, $endDate = null)
     {

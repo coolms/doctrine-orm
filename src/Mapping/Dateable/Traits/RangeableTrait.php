@@ -31,7 +31,7 @@ trait RangeableTrait
     protected $endDate;
 
     /**
-     * @return DateTime
+     * @return null|DateTime
      */
     public function getStartDate()
     {
@@ -39,7 +39,7 @@ trait RangeableTrait
     }
 
     /**
-     * @param string|int|DateTime $date
+     * @param string|int|null|DateTime $date
      */
     public function setStartDate($date)
     {
@@ -47,7 +47,7 @@ trait RangeableTrait
     }
 
     /**
-     * @return DateTime
+     * @return null|DateTime
      */
     public function getEndDate()
     {
@@ -55,7 +55,7 @@ trait RangeableTrait
     }
 
     /**
-     * @param string|int|DateTime $date
+     * @param string|int|null|DateTime $date
      */
     public function setEndDate($date)
     {
@@ -68,7 +68,7 @@ trait RangeableTrait
      */
     private function normalizeDate($date)
     {
-        if ($date instanceof DateTime) {
+        if (null === $date || $date instanceof DateTime) {
             return $date;
         }
 
