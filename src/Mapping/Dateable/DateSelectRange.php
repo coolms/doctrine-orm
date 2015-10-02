@@ -22,7 +22,6 @@ use DateTime,
  * @Form\Hydrator("DoctrineModule\Stdlib\Hydrator\DoctrineObject")
  * @Form\Type("DateSelectRange")
  * @Form\Options({
- *      "create_empty_option":true,
  *      "label":"Select date range",
  *      "text_domain":"default"})
  */

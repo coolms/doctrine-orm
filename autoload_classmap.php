@@ -11,6 +11,7 @@ return array(
     'CmsDoctrineORM\Factory\Form\ObjectRadioFactory'                               => __DIR__ . '/src/Factory/Form/ObjectRadioFactory.php',
     'CmsDoctrineORM\Factory\Form\ObjectSelectFactory'                              => __DIR__ . '/src/Factory/Form/ObjectSelectFactory.php',
     'CmsDoctrineORM\Form\Annotation\AnnotationBuilder'                             => __DIR__ . '/src/Form/Annotation/AnnotationBuilder.php',
+    'CmsDoctrineORM\Form\Annotation\ElementListener'                               => __DIR__ . '/src/Form/Annotation/ElementListener.php',
     'CmsDoctrineORM\Form\Annotation\FormAbstractServiceFactory'                    => __DIR__ . '/src/Form/Annotation/FormAbstractServiceFactory.php',
     'CmsDoctrineORM\Initializer\EntityManagerInitializer'                          => __DIR__ . '/src/Initializer/EntityManagerInitializer.php',
     'CmsDoctrineORM\Initializer\TranslatableLocaleInitializer'                     => __DIR__ . '/src/Initializer/TranslatableLocaleInitializer.php',
