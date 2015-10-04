@@ -72,8 +72,10 @@ return [
         'eventmanager' => [
             'orm_default' => [
                 'subscribers' => [
-                    'CmsDoctrine\Mapping\Relation\RelationSubscriber'
-                        => 'CmsDoctrine\Mapping\Relation\RelationSubscriber',
+                    'CmsDoctrine\Mapping\Embedded\OverrideSubscriber'
+                        => 'CmsDoctrine\Mapping\Embedded\OverrideSubscriber',
+                    'CmsDoctrine\Mapping\Relation\OverrideSubscriber'
+                        => 'CmsDoctrine\Mapping\Relation\OverrideSubscriber',
                     'CmsDoctrine\Mapping\Metadatable\MetadatableSubscriber'
                         => 'CmsDoctrine\Mapping\Metadatable\MetadatableSubscriber',
                     'CmsDoctrine\Mapping\Hierarchy\HierarchySubscriber'
@@ -95,6 +97,8 @@ return [
                 'listeners' => [
                     'CmsDoctrine\Form\Annotation\ElementResolverListener'
                         => 'CmsDoctrine\Form\Annotation\ElementResolverListener',
+                    'CmsDoctrineORM\Form\Annotation\ElementListener'
+                        => 'CmsDoctrineORM\Form\Annotation\ElementListener',
                 ],
             ],
         ],

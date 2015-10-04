@@ -34,6 +34,17 @@ class ElementListener extends AbstractListenerAggregate
      */
     public function attach(EventManagerInterface $events)
     {
-        
+        $this->listeners[] = $events->attach('configureElement', [$this, 'handleAllowEmpty']);
+    }
+
+    /**
+     * @param \Zend\EventManager\EventInterface $e
+     */
+    public function handleAllowEmpty($e)
+    {
+        $elementSpec = $e->getParam('elementSpec');
+        /*if ($elementSpec['spec']['name']) {
+            var_dump($elementSpec);
+        }*/
     }
 }
