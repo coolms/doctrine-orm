@@ -23,7 +23,8 @@ use DateTime,
  * @Form\Type("DateSelectRange")
  * @Form\Options({
  *      "label":"Select date range",
- *      "text_domain":"default"})
+ *      "text_domain":"default",
+ *      "partial":"cms-common/date-select-range"})
  */
 class DateSelectRange implements RangeableInterface
 {
