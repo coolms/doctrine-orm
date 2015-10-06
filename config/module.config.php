@@ -26,7 +26,7 @@ return [
                 'query_cache' => 'array',
                 'result_cache' => 'array',
                 'naming_strategy' => 'CmsDoctrineORM\Mapping\DefaultNamingStrategy',
-                'generate_proxies' => \Doctrine\Common\Proxy\AbstractProxyFactory::AUTOGENERATE_ALWAYS,
+                'generate_proxies' => \Doctrine\Common\Proxy\AbstractProxyFactory::AUTOGENERATE_FILE_NOT_EXISTS,
                 'proxy_dir' => 'data/DoctrineORMModule/Proxy',
                 'proxy_namespace' => 'DoctrineORMModule\Proxy',
                 'datetime_functions' => [
