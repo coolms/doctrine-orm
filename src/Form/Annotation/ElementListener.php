@@ -36,7 +36,6 @@ class ElementListener extends AbstractListenerAggregate
     {
         $this->listeners[] = $events->attach('configureElement', [$this, 'handleRequired']);
         $this->listeners[] = $events->attach('configureElement', [$this, 'handleAllowEmpty']);
-        //$this->listeners[] = $events->attach('checkForExclude', [$this, 'handleAllowEmpty']);
     }
 
     /**
@@ -45,7 +44,9 @@ class ElementListener extends AbstractListenerAggregate
     public function handleRequired($e)
     {
         $formSpec = $e->getParam('formSpec');
-        if (!(isset($formSpec['object']) && $this->objectManager->getMetadataFactory()->hasMetadataFor($formSpec['object']))) {
+        if (!(isset($formSpec['object']) &&
+            $this->objectManager->getMetadataFactory()->hasMetadataFor($formSpec['object']))
+        ) {
             return;
         }
 
@@ -71,24 +72,16 @@ class ElementListener extends AbstractListenerAggregate
     public function handleAllowEmpty($e)
     {
         $formSpec = $e->getParam('formSpec');
-        if (!(isset($formSpec['object']) && $this->objectManager->getMetadataFactory()->hasMetadataFor($formSpec['object']))) {
+        if (!(isset($formSpec['object']) &&
+            $this->objectManager->getMetadataFactory()->hasMetadataFor($formSpec['object']))
+        ) {
             return;
         }
 
         $metadata = $this->objectManager->getClassMetadata($formSpec['object']);
-        //foreach ($metadata->getFieldNames() as $fieldName) {
-            //$formSpec['input_filter'][$fieldName]['allow_empty'] = $metadata->getFieldMapping($fieldName)['nullable'];
-            //if (isset($formSpec['input_filter'])) {
-                //var_dump($fieldName);
-                //$formSpec['input_filter']['type'] = 'Zend\InputFilter\InputFilter';
-            //}
-        //}
-
         $fieldName = $e->getParam('elementSpec')['spec']['name'];
 
-        if ($metadata->hasField($formSpec['name'] . '.' . $fieldName)) {
-            $fieldName = $formSpec['name'] . '.' . $fieldName;
-        } elseif (!$metadata->hasField($fieldName)) {
+        if (!$metadata->hasField($fieldName)) {
             return;
         }
 
