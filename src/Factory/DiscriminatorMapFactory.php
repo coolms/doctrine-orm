@@ -12,6 +12,7 @@ namespace CmsDoctrineORM\Factory;
 
 use Zend\ServiceManager\ServiceLocatorInterface,
     DoctrineModule\Service\AbstractFactory,
+    CmsDoctrineORM\Options\DiscriminatorMap,
     CmsDoctrine\Tool\DiscriminatorMapSubscriber;
 
 class DiscriminatorMapFactory extends AbstractFactory
@@ -21,7 +22,7 @@ class DiscriminatorMapFactory extends AbstractFactory
      */
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
-        /* @var $options \CmsDoctrineORM\Options\DiscriminatorMap */
+        /* @var $options DiscriminatorMap */
         $options      = $this->getOptions($serviceLocator, 'discriminator_map');
         $eventManager = $serviceLocator->get($options->getEventManager());
         $maps         = $options->getMaps();
@@ -39,6 +40,6 @@ class DiscriminatorMapFactory extends AbstractFactory
      */
     public function getOptionsClass()
     {
-        return 'CmsDoctrineORM\\Options\\DiscriminatorMap';
+        return DiscriminatorMap::class;
     }
 }

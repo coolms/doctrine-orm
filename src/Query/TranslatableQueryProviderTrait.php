@@ -12,6 +12,7 @@ namespace CmsDoctrineORM\Query;
 
 use Doctrine\ORM\Query,
     Doctrine\ORM\QueryBuilder,
+    Gedmo\Translatable\Query\TreeWalker\TranslationWalker,
     CmsDoctrine\Mapping\Translatable\TranslatableSubscriber;
 
 /**
@@ -54,7 +55,7 @@ trait TranslatableQueryProviderTrait
 
         if ($locale) {
             // Use Translation Walker
-            $query->setHint(Query::HINT_CUSTOM_OUTPUT_WALKER, 'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker')
+            $query->setHint(Query::HINT_CUSTOM_OUTPUT_WALKER, TranslationWalker::class)
                 // Force the locale
                 ->setHint(TranslatableSubscriber::HINT_TRANSLATABLE_LOCALE, $locale);
         }

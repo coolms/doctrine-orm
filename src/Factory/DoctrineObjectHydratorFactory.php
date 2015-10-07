@@ -12,6 +12,7 @@ namespace CmsDoctrineORM\Factory;
 
 use Zend\ServiceManager\FactoryInterface,
     Zend\ServiceManager\ServiceLocatorInterface,
+    Doctrine\ORM\EntityManager,
     CmsDoctrine\Stdlib\Hydrator\DoctrineObject;
 
 class DoctrineObjectHydratorFactory implements FactoryInterface
@@ -22,6 +23,6 @@ class DoctrineObjectHydratorFactory implements FactoryInterface
     public function createService(ServiceLocatorInterface $hydrators)
     {
         $services = $hydrators->getServiceLocator();
-        return new DoctrineObject($services->get('Doctrine\\ORM\\EntityManager'));
+        return new DoctrineObject($services->get(EntityManager::class));
     }
 }

@@ -12,7 +12,8 @@ namespace CmsDoctrineORM\Persistence;
 
 use Zend\ServiceManager\AbstractFactoryInterface,
     Zend\ServiceManager\AbstractPluginManager,
-    Zend\ServiceManager\ServiceLocatorInterface;
+    Zend\ServiceManager\ServiceLocatorInterface,
+    Doctrine\ORM\EntityManager;
 
 class MapperAbstractServiceFactory implements AbstractFactoryInterface
 {
@@ -46,10 +47,10 @@ class MapperAbstractServiceFactory implements AbstractFactoryInterface
 
     /**
      * @param ServiceLocatorInterface $services
-     * @return \Doctrine\ORM\EntityManager
+     * @return EntityManager
      */
     protected function getObjectManager(ServiceLocatorInterface $services)
     {
-        return $services->get('Doctrine\\ORM\\EntityManager');
+        return $services->get(EntityManager::class);
     }
 }

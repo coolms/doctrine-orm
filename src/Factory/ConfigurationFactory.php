@@ -12,6 +12,7 @@ namespace CmsDoctrineORM\Factory;
 
 use Zend\ServiceManager\ServiceLocatorInterface,
     DoctrineORMModule\Service\ConfigurationFactory as DoctrineORMConfigurationFactory,
+    CmsDoctrineORM\Options\Configuration,
     CmsDoctrineORM\Tool\TablePrefixSubscriber;
 
 class ConfigurationFactory extends DoctrineORMConfigurationFactory
@@ -21,7 +22,7 @@ class ConfigurationFactory extends DoctrineORMConfigurationFactory
      */
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
-        /* @var $options \CmsDoctrineORM\Options\Configuration */
+        /* @var $options Configuration */
         $options = $this->getOptions($serviceLocator);
 
         if ($tablePrefix = $options->getTablePrefix()) {
@@ -38,6 +39,6 @@ class ConfigurationFactory extends DoctrineORMConfigurationFactory
      */
     protected function getOptionsClass()
     {
-        return 'CmsDoctrineORM\\Options\\Configuration';
+        return Configuration::class;
     }
 }

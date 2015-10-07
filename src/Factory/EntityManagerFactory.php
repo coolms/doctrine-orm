@@ -11,7 +11,8 @@
 namespace CmsDoctrineORM\Factory;
 
 use Zend\ServiceManager\ServiceLocatorInterface,
-    DoctrineORMModule\Service\EntityManagerFactory as BaseEntityManagerFactory;
+    DoctrineORMModule\Service\EntityManagerFactory as BaseEntityManagerFactory,
+    CmsDoctrineORM\Options\EntityManager;
 
 class EntityManagerFactory extends BaseEntityManagerFactory
 {
@@ -22,7 +23,7 @@ class EntityManagerFactory extends BaseEntityManagerFactory
      */
     public function createService(ServiceLocatorInterface $sl)
     {
-        /* @var $options \CmsDoctrineORM\Options\EntityManager */
+        /* @var $options EntityManager */
         $options = $this->getOptions($sl, 'entitymanager');
 
         // initializing the discriminator and relation map
@@ -38,6 +39,6 @@ class EntityManagerFactory extends BaseEntityManagerFactory
      */
     public function getOptionsClass()
     {
-        return 'CmsDoctrineORM\\Options\\EntityManager';
+        return EntityManager::class;
     }
 }

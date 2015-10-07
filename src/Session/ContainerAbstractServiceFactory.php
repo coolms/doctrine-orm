@@ -13,7 +13,7 @@ namespace CmsDoctrineORM\Session;
 use Zend\ServiceManager\AbstractPluginManager,
     Zend\ServiceManager\ServiceLocatorInterface,
     Zend\Session\Service\ContainerAbstractServiceFactory as ZendContainerAbstractServiceFactory,
-    Doctrine\Common\Persistence\ObjectManager,
+    Doctrine\ORM\EntityManager,
     CmsDoctrine\Session\Container;
 
 class ContainerAbstractServiceFactory extends ZendContainerAbstractServiceFactory
@@ -49,15 +49,15 @@ class ContainerAbstractServiceFactory extends ZendContainerAbstractServiceFactor
             $requestedName,
             $this->getSessionManager($services),
             $this->getObjectManager($services)
-            );
+        );
     }
 
     /**
      * @param ServiceLocatorInterface $services
-     * @return ObjectManager
+     * @return EntityManager
      */
     protected function getObjectManager(ServiceLocatorInterface $services)
     {
-        return $services->get('Doctrine\\ORM\\EntityManager');
+        return $services->get(EntityManager::class);
     }
 }
