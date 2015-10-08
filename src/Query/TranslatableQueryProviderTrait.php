@@ -38,6 +38,10 @@ trait TranslatableQueryProviderTrait
      */
     public function getTranslatableLocale()
     {
+        if (null === $this->locale) {
+            return \Locale::getDefault();
+        }
+
         return $this->locale;
     }
 
