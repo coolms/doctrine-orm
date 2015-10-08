@@ -12,6 +12,7 @@ namespace CmsDoctrineORM\Factory\Form;
 
 use Zend\ServiceManager\ServiceLocatorInterface,
     Zend\ServiceManager\FactoryInterface,
+    Doctrine\ORM\EntityManager,
     CmsDoctrine\Form\Element\ObjectMultiCheckbox;
 
 /**
@@ -21,11 +22,13 @@ class ObjectMultiCheckboxFactory implements FactoryInterface
 {
     /**
      * {@inheritDoc}
+     *
+     * @return ObjectMultiCheckbox
      */
     public function createService(ServiceLocatorInterface $pluginManager)
     {
         $services      = $pluginManager->getServiceLocator();
-        $entityManager = $services->get('Doctrine\\ORM\\EntityManager');
+        $entityManager = $services->get(EntityManager::class);
         $element       = new ObjectMultiCheckbox;
 
         $element->getProxy()->setObjectManager($entityManager);

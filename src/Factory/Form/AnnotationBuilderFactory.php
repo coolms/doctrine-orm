@@ -14,6 +14,7 @@ use RuntimeException,
     Zend\EventManager\ListenerAggregateInterface,
     Zend\ServiceManager\ServiceLocatorInterface,
     DoctrineModule\Service\AbstractFactory,
+    CmsCommon\Form\Options\FormAnnotationBuilder as AnnotationBuilderOptions,
     CmsDoctrineORM\Form\Annotation\AnnotationBuilder;
 
 /**
@@ -76,6 +77,6 @@ class AnnotationBuilderFactory extends AbstractFactory
      */
     public function getOptionsClass()
     {
-        return 'CmsCommon\\Form\\Options\\FormAnnotationBuilder';
+        return AnnotationBuilderOptions::class;
     }
 }

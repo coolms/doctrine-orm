@@ -12,6 +12,7 @@ namespace CmsDoctrineORM\Factory\Form;
 
 use Zend\ServiceManager\ServiceLocatorInterface,
     Zend\ServiceManager\FactoryInterface,
+    Doctrine\ORM\EntityManager,
     CmsDoctrine\Form\Element\ObjectRadio;
 
 /**
@@ -21,11 +22,13 @@ class ObjectRadioFactory implements FactoryInterface
 {
     /**
      * {@inheritDoc}
+     *
+     * @return ObjectRadio
      */
     public function createService(ServiceLocatorInterface $pluginManager)
     {
         $services      = $pluginManager->getServiceLocator();
-        $entityManager = $services->get('Doctrine\\ORM\\EntityManager');
+        $entityManager = $services->get(EntityManager::class);
         $element       = new ObjectRadio;
 
         $element->getProxy()->setObjectManager($entityManager);

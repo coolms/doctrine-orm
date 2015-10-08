@@ -13,6 +13,7 @@ namespace CmsDoctrineORM\Initializer;
 use Zend\ServiceManager\AbstractPluginManager,
     Zend\ServiceManager\InitializerInterface,
     Zend\ServiceManager\ServiceLocatorInterface,
+    Doctrine\ORM\EntityManager,
     DoctrineModule\Persistence\ObjectManagerAwareInterface;
 
 class EntityManagerInitializer implements InitializerInterface
@@ -27,7 +28,7 @@ class EntityManagerInitializer implements InitializerInterface
             	$serviceLocator = $serviceLocator->getServiceLocator();
             }
 
-            $objectManager = $serviceLocator->get('Doctrine\\ORM\\EntityManager');
+            $objectManager = $serviceLocator->get(EntityManager::class);
             $instance->setObjectManager($objectManager);
         }
 	}
