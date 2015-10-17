@@ -11,8 +11,8 @@
 namespace CmsDoctrineORM\Mapping\Dateable;
 
 use DateTime,
-    Doctrine\ORM\Mapping as ORM,
     Zend\Form\Annotation as Form,
+    Doctrine\ORM\Mapping as ORM,
     CmsCommon\Mapping\Dateable\RangeableInterface;
 
 /**
@@ -24,7 +24,7 @@ use DateTime,
  * @Form\Options({
  *      "label":"Select date range",
  *      "text_domain":"default",
- *      "partial":"cms-common/date-select-range"})
+ *      "partial":"cms-common/date-select-range-fieldset"})
  */
 class DateSelectRange implements RangeableInterface
 {
