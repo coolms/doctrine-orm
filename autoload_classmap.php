@@ -31,6 +31,7 @@ return array(
     'CmsDoctrineORM\Mapping\Common\Traits\IdentifiableTrait'                       => __DIR__ . '/src/Mapping/Common/Traits/IdentifiableTrait.php',
     'CmsDoctrineORM\Mapping\Common\Traits\NameableTrait'                           => __DIR__ . '/src/Mapping/Common/Traits/NameableTrait.php',
     'CmsDoctrineORM\Mapping\Common\Traits\ObjectableTrait'                         => __DIR__ . '/src/Mapping/Common/Traits/ObjectableTrait.php',
+    'CmsDoctrineORM\Mapping\Common\Traits\QuantifiableTrait'                       => __DIR__ . '/src/Mapping/Common/Traits/QuantifiableTrait.php',
     'CmsDoctrineORM\Mapping\Common\Traits\StateableTrait'                          => __DIR__ . '/src/Mapping/Common/Traits/StateableTrait.php',
     'CmsDoctrineORM\Mapping\Common\Traits\TitleableTrait'                          => __DIR__ . '/src/Mapping/Common/Traits/TitleableTrait.php',
     'CmsDoctrineORM\Mapping\Common\Traits\ValuableTrait'                           => __DIR__ . '/src/Mapping/Common/Traits/ValuableTrait.php',
