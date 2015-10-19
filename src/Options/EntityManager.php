@@ -25,6 +25,11 @@ class EntityManager extends BaseEntityManagerOptions
     protected $discriminatorMap = 'orm_default';
 
     /**
+     * @var string
+     */
+    protected $initializers = 'orm_default';
+
+    /**
      * @param  string $discriminatorMap
      * @return static
      */
@@ -40,5 +45,23 @@ class EntityManager extends BaseEntityManagerOptions
     public function getDiscriminatorMap()
     {
         return "doctrine.discriminator_map.{$this->discriminatorMap}";
+    }
+
+    /**
+     * @param  string $initializers
+     * @return static
+     */
+    public function setInitializers($initializers)
+    {
+        $this->initializers = (string) $initializers;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getInitializers()
+    {
+        return "doctrine.initializers.{$this->initializers}";
     }
 }

@@ -102,12 +102,19 @@ return [
                 ],
             ],
         ],
+        'initializers' => [
+            'orm_default' => [
+                'CmsCommon\Initializer\ServiceManagerInitializer'
+                    => 'CmsCommon\Initializer\ServiceManagerInitializer',
+            ],
+        ],
     ],
     'doctrine_factories' => [
         'configuration' => 'CmsDoctrineORM\Factory\ConfigurationFactory',
         'discriminator_map' => 'CmsDoctrineORM\Factory\DiscriminatorMapFactory',
         'entitymanager' => 'CmsDoctrineORM\Factory\EntityManagerFactory',
         'formannotationbuilder' => 'CmsDoctrineORM\Factory\Form\AnnotationBuilderFactory',
+        'initializers' => 'CmsDoctrineORM\Factory\InitializersFactory',
     ],
     'form_elements' => [
         'factories' => [

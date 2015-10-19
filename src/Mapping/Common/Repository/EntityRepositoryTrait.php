@@ -10,7 +10,9 @@
 
 namespace CmsDoctrineORM\Mapping\Common\Repository;
 
-use Zend\Paginator\Paginator,
+use Zend\EventManager\EventManagerAwareTrait,
+    Zend\ServiceManager\ServiceLocatorAwareTrait,
+    Zend\Paginator\Paginator,
     Doctrine\ORM\AbstractQuery,
     Doctrine\ORM\EntityManager,
     Doctrine\ORM\Mapping\ClassMetadata,
@@ -21,7 +23,9 @@ use Zend\Paginator\Paginator,
 
 trait EntityRepositoryTrait
 {
-    use ExpressionBuilderTrait;
+    use ExpressionBuilderTrait,
+        EventManagerAwareTrait,
+        ServiceLocatorAwareTrait;
 
     /**
      * @return EntityManager
@@ -75,7 +79,6 @@ trait EntityRepositoryTrait
         $currentPageNumber = null,
         $itemCountPerPage = null
     ) {
-        try {
         if ($criteria || $orderBy) {
             $query = $this->findByQuery($criteria, $orderBy);
         } else {
@@ -93,10 +96,6 @@ trait EntityRepositoryTrait
             $paginator->setItemCountPerPage($itemCountPerPage);
         }
 
-        } catch (\Exception $e) {
-            var_dump($e->getTraceAsString());
-            exit;
-        }
         return $paginator;
     }
 
@@ -396,6 +395,49 @@ trait EntityRepositoryTrait
     public function getSingleScalarResult(QueryBuilder $qb, $locale = null)
     {
         return $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * @param array $criteria
+     * @return object
+     */
+    public function findOneOrCreate(array $criteria = null)
+    {
+        if (!($entity = $this->findOneBy($criteria))) {
+            $entity = $this->create($criteria);
+        }
+
+        return $entity;
+    }
+
+    /**
+     * @param array $args
+     * @return object
+     */
+    public function create(array $args = null)
+    {
+        $class = $this->getClassMetadata()->getReflectionClass();
+        if ($args && ($construct = $class->getConstructor()) && $construct->getNumberOfRequiredParameters()) {
+            $instanceArgs = [];
+            foreach($construct->getParameters() as $parameter) {
+                $name = $parameter->getName();
+                if (isset($args[$name])) {
+                    $instanceArgs[$name] = $args[$name];
+                    unset($args[$name]);
+                }
+            }
+
+            $instance = $class->newInstanceArgs($instanceArgs);
+        } else {
+            $className = $class->getName();
+            $instance = new $className();
+        }
+
+        if ($args) {
+            $instance = $this->getEntityManager()->getHydratorFactory()->hydrate($instance, $args);
+        }
+
+        return $instance;
     }
 
     /**

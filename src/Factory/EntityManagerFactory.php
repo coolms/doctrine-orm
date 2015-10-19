@@ -30,6 +30,7 @@ class EntityManagerFactory extends BaseEntityManagerFactory
         // @todo should actually attach it to a fetched event manager here, and not
         //       rely on its factory code
         $sl->get($options->getDiscriminatorMap());
+        $sl->get($options->getInitializers());
 
         return parent::createService($sl);
     }

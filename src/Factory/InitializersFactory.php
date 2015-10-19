@@ -12,23 +12,25 @@ namespace CmsDoctrineORM\Factory;
 
 use Zend\ServiceManager\ServiceLocatorInterface,
     DoctrineModule\Service\AbstractFactory,
-    CmsDoctrine\Tool\DiscriminatorMapSubscriber,
-    CmsDoctrineORM\Options\DiscriminatorMap;
+    CmsDoctrine\Tool\InitializerSubscriber,
+    CmsDoctrineORM\Options\Initializers;
 
-class DiscriminatorMapFactory extends AbstractFactory
+class InitializersFactory extends AbstractFactory
 {
     /**
      * {@inheritDoc}
      */
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
-        /* @var $options DiscriminatorMap */
-        $options      = $this->getOptions($serviceLocator, 'discriminator_map');
+        /* @var $options Initializers */
+        $options      = $this->getOptions($serviceLocator, 'initializers');
         $eventManager = $serviceLocator->get($options->getEventManager());
-        $maps         = $options->getMaps();
+        $initializers = $options->getInitializers();
 
-        $subscriber   = new DiscriminatorMapSubscriber($maps);
-        $eventManager->addEventSubscriber($subscriber);
+        foreach ($initializers as $initializer) {
+            $subscriber = new InitializerSubscriber($serviceLocator->get($initializer), $serviceLocator);
+            $eventManager->addEventSubscriber($subscriber);
+        }
 
         return $eventManager;
     }
@@ -40,6 +42,6 @@ class DiscriminatorMapFactory extends AbstractFactory
      */
     public function getOptionsClass()
     {
-        return DiscriminatorMap::class;
+        return Initializers::class;
     }
 }
