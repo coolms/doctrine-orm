@@ -31,7 +31,7 @@ trait QuantifiableTrait
      *      "text_domain":"default"})
      * @Form\Flags({"priority":750})
      */
-    protected $quantity = 0;
+    protected $quantity;
 
     /**
      * @param int $quantity
