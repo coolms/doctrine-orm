@@ -12,6 +12,7 @@ namespace CmsDoctrineORM\Mapping\Common\Repository;
 
 use Zend\EventManager\EventManagerAwareTrait,
     Zend\ServiceManager\ServiceLocatorAwareTrait,
+    Zend\Stdlib\Hydrator\HydratorInterface,
     Zend\Paginator\Paginator,
     Doctrine\ORM\AbstractQuery,
     Doctrine\ORM\EntityManager,
@@ -19,6 +20,8 @@ use Zend\EventManager\EventManagerAwareTrait,
     Doctrine\ORM\Tools\Pagination\Paginator as ORMPaginator,
     Doctrine\ORM\QueryBuilder,
     DoctrineORMModule\Paginator\Adapter\DoctrinePaginator as DoctrineAdapter,
+    CmsDoctrine\Stdlib\Hydrator\DoctrineObject,
+    CmsDoctrine\Tool\InitializerSubscriber,
     CmsDoctrineORM\Query\ExpressionBuilderTrait;
 
 trait EntityRepositoryTrait
@@ -26,6 +29,11 @@ trait EntityRepositoryTrait
     use ExpressionBuilderTrait,
         EventManagerAwareTrait,
         ServiceLocatorAwareTrait;
+
+    /**
+     * @var HydratorInterface
+     */
+    private $hydrator;
 
     /**
      * @return EntityManager
@@ -416,7 +424,17 @@ trait EntityRepositoryTrait
      */
     public function create(array $args = null)
     {
-        $class = $this->getClassMetadata()->getReflectionClass();
+        $uow = $this->getEntityManager()->getUnitOfWork();
+        $instance = $uow->createEntity($this->getClassName(), $args);
+
+        $listeners = $this->getEntityManager()->getEventManager()->getListeners('postLoad');
+        foreach ($listeners as $listener) {
+            if ($listener instanceof InitializerSubscriber) {
+                $listener->initialize($instance);
+            }
+        }
+
+        /*$class = $this->getClassMetadata()->getReflectionClass();
         if ($args && ($construct = $class->getConstructor()) && $construct->getNumberOfRequiredParameters()) {
             $instanceArgs = [];
             foreach($construct->getParameters() as $parameter) {
@@ -434,8 +452,10 @@ trait EntityRepositoryTrait
         }
 
         if ($args) {
-            $instance = $this->getEntityManager()->getHydratorFactory()->hydrate($instance, $args);
+            $instance = $this->getHydrator()->hydrate($args, $instance);
         }
+
+        $instance = $this->getEntityManager()->merge($instance);*/
 
         return $instance;
     }
@@ -449,7 +469,6 @@ trait EntityRepositoryTrait
         $this->guardEntity($entity);
         $em = $this->getEntityManager();
         $em->persist($entity);
-
         return $this;
     }
 
@@ -462,7 +481,6 @@ trait EntityRepositoryTrait
         $this->guardEntity($entity);
         $em = $this->getEntityManager();
         $em->persist($entity);
-
         return $this;
     }
 
@@ -475,7 +493,6 @@ trait EntityRepositoryTrait
         $this->guardEntity($entity);
         $em = $this->getEntityManager();
         $em->remove($entity);
-
         return $this;
     }
 
@@ -526,7 +543,39 @@ trait EntityRepositoryTrait
     public function hydrate(array $data, $entity)
     {
         $this->guardEntity($entity);
-        return $this->getEntityManager()->getHydratorFactory()->hydrate($entity, $data);
+        return $this->getHydrator()->hydrate($data, $entity);
+    }
+
+    /**
+     * @param object $entity
+     * @return array
+     */
+    public function extract($entity)
+    {
+        $this->guardEntity($entity);
+        return $this->getHydrator()->extract($entity);
+    }
+
+    /**
+     * @return HydratorInterface
+     */
+    protected function getHydrator()
+    {
+        if (null === $this->hydrator) {
+            $this->setHydrator(new DoctrineObject($this->getEntityManager()));
+        }
+
+        return $this->hydrator;
+    }
+
+    /**
+     * @param HydratorInterface $hydrator
+     * @return self
+     */
+    public function setHydrator(HydratorInterface $hydrator)
+    {
+        $this->hydrator = $hydrator;
+        return $this;
     }
 
     /**
