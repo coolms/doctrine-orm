@@ -10,6 +10,12 @@
 
 namespace CmsDoctrineORM;
 
+use Doctrine\Common\Proxy\AbstractProxyFactory,
+    Doctrine\ORM\Mapping\Driver\AnnotationDriver,
+    CmsDoctrine\DBAL\Types\DecimalObject,
+    CmsDoctrineORM\Mapping\DefaultNamingStrategy,
+    CmsDoctrineORM\Mapping\Common\Repository\EntityRepository;
+
 return [
     'doctrine' => [
         'cache' => [
@@ -25,14 +31,18 @@ return [
                 'metadata_cache' => 'array',
                 'query_cache' => 'array',
                 'result_cache' => 'array',
-                'naming_strategy' => 'CmsDoctrineORM\Mapping\DefaultNamingStrategy',
-                'generate_proxies' => \Doctrine\Common\Proxy\AbstractProxyFactory::AUTOGENERATE_FILE_NOT_EXISTS,
+                'naming_strategy' => DefaultNamingStrategy::class,
+                'generate_proxies' => AbstractProxyFactory::AUTOGENERATE_FILE_NOT_EXISTS,
                 'proxy_dir' => 'data/DoctrineORMModule/Proxy',
                 'proxy_namespace' => 'DoctrineORMModule\Proxy',
+                'default_repository_class_name' => EntityRepository::class,
                 'datetime_functions' => [
                     'YEAR' => 'DoctrineExtensions\Query\Mysql\Year',
                     'IFNULL' => 'DoctrineExtensions\Query\Mysql\IfNull',
                     'DATE' => 'CmsDoctrineORM\Query\Mysql\Date',
+                ],
+                'types' => [
+                    'decimal_object' => DecimalObject::class,
                 ],
             ],
         ],
@@ -43,12 +53,12 @@ return [
         ],
         'driver' => [
             'cmsdoctrineorm_dateable_metadata_driver' => [
-                'class' => 'Doctrine\ORM\Mapping\Driver\AnnotationDriver',
+                'class' => AnnotationDriver::class,
                 'cache' => 'array',
                 'paths' => __DIR__ . '/../src/Mapping/Dateable',
             ],
             'cmsdoctrineorm_translatable_metadata_driver' => [
-                'class' => 'Doctrine\ORM\Mapping\Driver\AnnotationDriver',
+                'class' => AnnotationDriver::class,
                 'cache' => 'array',
                 'paths' => __DIR__ . '/../src/Mapping/Translatable',
             ],
