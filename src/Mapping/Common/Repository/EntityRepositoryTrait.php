@@ -23,6 +23,7 @@ use Zend\EventManager\EventManagerAwareTrait,
     CmsDoctrine\Stdlib\Hydrator\DoctrineObject,
     CmsDoctrine\Tool\InitializerSubscriber,
     CmsDoctrineORM\Query\ExpressionBuilderTrait;
+use Doctrine\Common\Collections\ArrayCollection;
 
 trait EntityRepositoryTrait
 {
@@ -424,18 +425,19 @@ trait EntityRepositoryTrait
      */
     public function create(array $args = null)
     {
-        $uow = $this->getEntityManager()->getUnitOfWork();
-        $instance = $uow->createEntity($this->getClassName(), $args);
+        $meta = $this->getClassMetadata();
 
-        $listeners = $this->getEntityManager()->getEventManager()->getListeners('postLoad');
-        foreach ($listeners as $listener) {
-            if ($listener instanceof InitializerSubscriber) {
-                $listener->initialize($instance);
-            }
+        $identityFields = $meta->getIdentifierFieldNames();
+        $identityFields = array_diff($identityFields, $args);
+
+        foreach ($identityFields as $id) {
+            $args[$id] = null;
         }
 
-        /*$class = $this->getClassMetadata()->getReflectionClass();
-        if ($args && ($construct = $class->getConstructor()) && $construct->getNumberOfRequiredParameters()) {
+        $class = $this->getClassMetadata()->getReflectionClass();
+        $construct = $class->getConstructor();
+
+        if ($construct && $construct->getNumberOfRequiredParameters()) {
             $instanceArgs = [];
             foreach($construct->getParameters() as $parameter) {
                 $name = $parameter->getName();
@@ -451,12 +453,29 @@ trait EntityRepositoryTrait
             $instance = new $className();
         }
 
-        if ($args) {
-            $instance = $this->getHydrator()->hydrate($args, $instance);
+        $em = $this->getEntityManager();
+        foreach ($args as $name => $value) {            
+            if ($class->hasProperty($name)) {
+                if (!is_object($value) && $meta->isSingleValuedAssociation($name)) {
+                    $entityName = $meta->getAssociationTargetClass($name);
+                    $value = $em->find($entityName, $value);
+                }
+
+                $property = $class->getProperty($name);
+                $property->setAccessible(true);
+                $property->setValue($instance, $value);
+            }
         }
 
-        $instance = $this->getEntityManager()->merge($instance);*/
+        $listeners = $this->getEntityManager()->getEventManager()->getListeners('postLoad');
+        foreach ($listeners as $listener) {
+            if ($listener instanceof InitializerSubscriber) {
+                $listener->initialize($instance);
+            }
+        }
 
+        $em->getUnitOfWork()->computeChangeSet($meta, $instance);
+        
         return $instance;
     }
 
