@@ -53,6 +53,6 @@ class FormAbstractServiceFactory extends CommonFormAbstractServiceFactory
      */
     protected function getAnnotationBuilder(ServiceLocatorInterface $services)
     {
-        return $services->get('Doctrine\\ORM\\FormAnnotationBuilder');
+        return $services->get(AnnotationBuilder::class);
     }
 }

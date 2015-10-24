@@ -161,6 +161,9 @@ return [
         ],
     ],
     'service_manager' => [
+        'aliases' => [
+            'CmsDoctrineORM\Form\Annotation\AnnotationBuilder' => 'Doctrine\ORM\FormAnnotationBuilder',
+        ],
         'factories' => [
             'Doctrine\ORM\FormAnnotationBuilder'
                 => 'CmsDoctrineORM\Factory\Form\AnnotationBuilderAliasCompatFactory',
