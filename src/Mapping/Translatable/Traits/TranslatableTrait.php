@@ -30,11 +30,12 @@ trait TranslatableTrait
      * @var string
      *
      * @ORM\Locale
-     * @Form\Type("Select")
+     * @Form\Type("LocaleSelect")
      * @Form\Required(false)
      * @Form\Options({
      *      "label":"Language",
      *      "empty_option":"Select Language",
+     *      "display_names":true,
      *      "text_domain":"default"})
      * @Form\Flags({"priority":950})
      */
