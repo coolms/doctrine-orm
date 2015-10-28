@@ -39,7 +39,7 @@ trait TranslatableTrait
      *      "text_domain":"default"})
      * @Form\Flags({"priority":950})
      */
-    protected $locale;
+    protected $translatableLocale;
 
     /**
      * __construct
@@ -53,25 +53,32 @@ trait TranslatableTrait
 
     /**
      * @param TranslationInterface[] $translations
+     * @return self
      */
     public function setTranslations($translations)
     {
         $this->clearTranslations();
         $this->addTranslations($translations);
+
+        return $this;
     }
 
     /**
      * @param TranslationInterface[] $translations
+     * @return self
      */
     public function addTranslations($translations)
     {
         foreach ($translations as $translation) {
             $this->addTranslation($translation);
         }
+
+        return $this;
     }
 
     /**
      * @param TranslationInterface $translation
+     * @return self
      */
     public function addTranslation(TranslationInterface $translation)
     {
@@ -79,24 +86,31 @@ trait TranslatableTrait
             $this->getTranslations()->add($translation);
             $translation->setObject($this);
         }
+
+        return $this;
     }
 
     /**
      * @param TranslationInterface[] $translations
+     * @return self
      */
     public function removeTranslations($translations)
     {
         foreach ($translations as $translation) {
             $this->removeTranslation($translation);
         }
+
+        return $this;
     }
 
     /**
      * @param TranslationInterface $translation
+     * @return self
      */
     public function removeTranslation(TranslationInterface $translation)
     {
         $this->getTranslations()->removeElement($translation);
+        return $this;
     }
 
     /**
@@ -109,18 +123,23 @@ trait TranslatableTrait
 
     /**
      * Removes all translations
+     *
+     * @return self
      */
     public function clearTranslations()
     {
         $this->getTranslations()->clear();
+        return $this;
     }
 
     /**
      * @param string $locale
+     * @return self
      */
     public function setTranslatableLocale($locale)
     {
-        $this->locale = (string) $locale;
+        $this->translatableLocale = (string) $locale;
+        return $this;
     }
 
     /**
@@ -128,6 +147,6 @@ trait TranslatableTrait
      */
     public function getTranslatableLocale()
     {
-        return $this->locale;
+        return $this->translatablelocale;
     }
 }
