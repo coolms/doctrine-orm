@@ -14,6 +14,7 @@ use Doctrine\Common\EventArgs,
     Doctrine\Common\EventSubscriber,
     Doctrine\ORM\Events,
     Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 
 /**
  * @author Dmitry Popov <d.popov@altgraphic.com>
@@ -50,18 +51,20 @@ class TablePrefixSubscriber implements EventSubscriber
      */
     public function loadClassMetadata(EventArgs $eventArgs)
     {
+        /* @var $classMetadata ClassMetadata */
         $classMetadata = $eventArgs->getClassMetadata();
 
         // If the entity is a subclass with STI, it gets its already prefixed table from inherited class
         if (!$classMetadata->isInheritanceTypeSingleTable() ||
             $classMetadata->getName() === $classMetadata->rootEntityName
         ) {
-            $classMetadata->setTableName($this->prefix.$classMetadata->getTableName());
+            $classMetadata->setTableName($this->prefix . $classMetadata->getTableName());
         }
 
         foreach ($classMetadata->getAssociationMappings() as $fieldName => $mapping) {
-            if ($mapping['type'] == ClassMetadataInfo::MANY_TO_MANY
-                && isset($classMetadata->associationMappings[$fieldName]['joinTable']['name'])
+            if ($mapping['type'] == ClassMetadataInfo::MANY_TO_MANY &&
+                $classMetadata->getName() === $classMetadata->rootEntityName &&
+                isset($classMetadata->associationMappings[$fieldName]['joinTable']['name'])
             ) {
                 $mappedTableName = $classMetadata->associationMappings[$fieldName]['joinTable']['name'];
                 $classMetadata->associationMappings[$fieldName]['joinTable']['name'] = $this->prefix . $mappedTableName;
