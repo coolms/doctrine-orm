@@ -24,7 +24,7 @@ trait HierarchyTrait
     /**
      * @var int
      *
-     * @ORM\Column(name="lvl",type="integer")
+     * @ORM\Column(name="lvl",type="smallint",nullable=true)
      * @ORM\TreeLevel
      * @Form\Exclude()
      */
