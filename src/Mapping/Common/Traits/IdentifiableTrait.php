@@ -35,10 +35,12 @@ trait IdentifiableTrait
 
     /**
      * @param number $id
+     * @return self
      */
     public function setId($id)
     {
         $this->id = $id;
+        return $this;
     }
 
     /**

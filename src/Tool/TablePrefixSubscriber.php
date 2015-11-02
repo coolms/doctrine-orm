@@ -62,8 +62,8 @@ class TablePrefixSubscriber implements EventSubscriber
         }
 
         foreach ($classMetadata->getAssociationMappings() as $fieldName => $mapping) {
-            if ($mapping['type'] == ClassMetadataInfo::MANY_TO_MANY &&
-                $classMetadata->getName() === $classMetadata->rootEntityName &&
+            if ($mapping['type'] === ClassMetadataInfo::MANY_TO_MANY &&
+                !$classMetadata->isInheritedAssociation($fieldName) &&
                 isset($classMetadata->associationMappings[$fieldName]['joinTable']['name'])
             ) {
                 $mappedTableName = $classMetadata->associationMappings[$fieldName]['joinTable']['name'];

@@ -33,11 +33,13 @@ trait ObjectableTrait
     protected $object;
 
     /**
-     * @param EntityInterface $object
+     * @param object $object
+     * @return self
      */
     public function setObject($object)
     {
         $this->object = $object;
+        return $this;
     }
 
     /**

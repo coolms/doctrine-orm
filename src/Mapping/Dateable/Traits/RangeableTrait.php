@@ -40,10 +40,12 @@ trait RangeableTrait
 
     /**
      * @param string|int|null|DateTime $date
+     * @return self
      */
     public function setStartDate($date)
     {
         $this->startDate = $this->normalizeDate($date);
+        return $this;
     }
 
     /**
@@ -56,10 +58,12 @@ trait RangeableTrait
 
     /**
      * @param string|int|null|DateTime $date
+     * @return self
      */
     public function setEndDate($date)
     {
         $this->endDate = $this->normalizeDate($date);
+        return $this;
     }
 
     /**

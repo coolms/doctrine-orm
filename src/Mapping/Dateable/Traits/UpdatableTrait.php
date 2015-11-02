@@ -31,10 +31,12 @@ trait UpdatableTrait
      * Set updated at
      *
      * @param DateTime $updatedAt
+     * @return self
      */
     public function setUpdatedAt(DateTime $updatedAt = null)
     {
         $this->updatedAt = $updatedAt;
+        return $this;
     }
 
     /**

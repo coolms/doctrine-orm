@@ -29,17 +29,19 @@ trait CreatableTrait
 
     /**
      * Set created at
-     * 
+     *
      * @param DateTime $createdAt
+     * @return self
      */
     public function setCreatedAt(DateTime $createdAt)
     {
         $this->createdAt = $createdAt;
+        return $this;
     }
 
     /**
      * Get created at
-     * 
+     *
      * @return DateTime
      */
     public function getCreatedAt()

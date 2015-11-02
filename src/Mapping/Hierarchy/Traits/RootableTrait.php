@@ -44,10 +44,12 @@ trait RootableTrait
 
     /**
      * @param string $root
+     * @return self
      */
     public function setRoot($root)
     {
         $this->root = $root;
+        return $this;
     }
 
     /**

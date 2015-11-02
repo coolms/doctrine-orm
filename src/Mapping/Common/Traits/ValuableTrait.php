@@ -43,10 +43,12 @@ trait ValuableTrait
 
     /**
      * @param string $value
+     * @return self
      */
     public function setValue($value)
     {
         $this->value = $value;
+        return $this;
     }
 
     /**

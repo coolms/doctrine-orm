@@ -35,10 +35,12 @@ trait VerifiableTrait
 
     /**
      * @param bool $verified
+     * @return self
      */
     public function setVerified($verified)
     {
         $this->verified = (bool) $verified;
+        return $this;
     }
 
     /**

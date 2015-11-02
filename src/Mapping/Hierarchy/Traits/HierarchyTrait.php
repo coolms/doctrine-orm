@@ -40,11 +40,11 @@ trait HierarchyTrait
     /**
      * @var HierarchyInterface[]
      */
-    protected $children;
+    protected $children = [];
 
     /**
      * __construct
-     * 
+     *
      * Initializes children
      */
     public function __construct()
@@ -54,10 +54,12 @@ trait HierarchyTrait
 
     /**
      * @param number $level
+     * @return self
      */
     public function setLevel($level)
     {
         $this->level = $level;
+        return $this;
     }
 
     /**
@@ -70,10 +72,12 @@ trait HierarchyTrait
 
     /**
      * @param HierarchyInterface $parent
+     * @return self
      */
     public function setParent(HierarchyInterface $parent = null)
     {
         $this->parent = $parent;
+        return $this;
     }
 
     /**
@@ -86,55 +90,71 @@ trait HierarchyTrait
 
     /**
      * @param HierarchyInterface[] $children
+     * @return self
      */
     public function setChildren($children)
     {
         $this->clearChildren();
         $this->addChildren($children);
+
+        return $this;
     }
 
     /**
      * @param HierarchyInterface[] $children
+     * @return self
      */
     public function addChildren($children)
     {
         foreach ($children as $child) {
             $this->addChild($child);
         }
+
+        return $this;
     }
 
     /**
      * @param HierarchyInterface $child
+     * @return self
      */
     public function addChild(HierarchyInterface $child)
     {
         $this->getChildren()->add($child);
+        return $this;
     }
 
     /**
      * @param HierarchyInterface[] $children
+     * @return self
      */
     public function removeChildren($children)
     {
         foreach ($children as $child) {
             $this->removeChild($child);
         }
+
+        return $this;
     }
 
     /**
      * @param HierarchyInterface $child
+     * @return self
      */
     public function removeChild(HierarchyInterface $child)
     {
         $this->getChildren()->removeElement($child);
+        return $this;
     }
 
     /**
      * Removes all children
+     *
+     * @return self
      */
     public function clearChildren()
     {
         $this->getChildren()->clear();
+        return $this;
     }
 
     /**

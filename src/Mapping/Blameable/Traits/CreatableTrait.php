@@ -24,10 +24,12 @@ trait CreatableTrait
      * Sets createdBy
      *
      * @param mixed $createdBy
+     * @return self
      */
     public function setCreatedBy($createdBy)
     {
         $this->createdBy = $createdBy;
+        return $this;
     }
 
     /**

@@ -24,10 +24,12 @@ trait UpdatableTrait
      * Sets updatedBy
      *
      * @param mixed $updatedBy
+     * @return self
      */
     public function setUpdatedBy($updatedBy)
     {
         $this->updatedBy = $updatedBy;
+        return $this;
     }
 
     /**

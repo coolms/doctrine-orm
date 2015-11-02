@@ -39,10 +39,12 @@ trait ContentableTrait
 
     /**
      * @param string $content
+     * @return self
      */
     public function setContent($content)
     {
         $this->content = $content;
+        return $this;
     }
 
     /**

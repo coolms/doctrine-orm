@@ -35,10 +35,12 @@ trait QuantifiableTrait
 
     /**
      * @param int $quantity
+     * @return self
      */
     public function setQuantity($quantity)
     {
         $this->quantity = (int) $quantity;
+        return $this;
     }
 
     /**

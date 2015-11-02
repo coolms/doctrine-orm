@@ -43,10 +43,12 @@ trait DescribableTrait
 
     /**
      * @param string $description
+     * @return self
      */
     public function setDescription($description)
     {
         $this->description = $description;
+        return $this;
     }
 
     /**

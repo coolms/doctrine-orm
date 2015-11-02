@@ -34,10 +34,12 @@ trait StateableTrait
 
     /**
      * @param int $state
+     * @return self
      */
     public function setState($state)
     {
         $this->state = $state;
+        return $this;
     }
 
     /**

@@ -42,10 +42,12 @@ trait AnnotatableTrait
 
     /**
      * @param string $annotation
+     * @return self
      */
     public function setAnnotation($annotation)
     {
         $this->annotation = $annotation;
+        return $this;
     }
 
     /**

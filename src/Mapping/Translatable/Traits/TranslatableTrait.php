@@ -21,7 +21,7 @@ trait TranslatableTrait
      *
      * @Form\Exclude()
      */
-    protected $translations;
+    protected $translations = [];
 
     /**
      * Used locale to override Translation listener's locale. 

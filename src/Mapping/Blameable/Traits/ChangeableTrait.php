@@ -24,10 +24,12 @@ trait ChangeableTrait
      * Sets changedBy
      *
      * @param mixed $changedBy
+     * @return self
      */
     public function setChangedBy($changedBy)
     {
         $this->changedBy = $changedBy;
+        return $this;
     }
 
     /**

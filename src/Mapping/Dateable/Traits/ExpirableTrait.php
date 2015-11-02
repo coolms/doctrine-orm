@@ -35,10 +35,12 @@ trait ExpirableTrait
      * Set expire at
      *
      * @param DateTime $expireAt
+     * @return self
      */
     public function setExpireAt(DateTime $expireAt = null)
     {
         $this->expireAt = $expireAt;
+        return $this;
     }
 
     /**
