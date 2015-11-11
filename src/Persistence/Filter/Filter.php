@@ -17,6 +17,11 @@ use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr\Composite;
 use CmsCommon\Stdlib\ArrayUtils;
 
+/**
+ * Data Mapper filter implementation for Doctrine2 ORM
+ *
+ * @author Dmitry Popov <d.popov@altgraphic.com>
+ */
 class Filter extends Composite implements FilterInterface
 {
     /**
@@ -54,10 +59,10 @@ class Filter extends Composite implements FilterInterface
      * @param QueryBuilder $qb
      * @param ClassMetadata $class
      */
-    public function __construct($criteria = [], QueryBuilder $qb, ClassMetadata $class)
+    public function __construct($criteria = [], QueryBuilder $qb, ClassMetadata $meta)
     {
         $this->qb = $qb;
-        $this->meta = $class;
+        $this->meta = $meta;
 
         if ($criteria) {
             $this->exchangeArray($criteria);
