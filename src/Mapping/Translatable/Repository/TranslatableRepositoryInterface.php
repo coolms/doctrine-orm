@@ -8,17 +8,17 @@
  * @author    Dmitry Popov <d.popov@altgraphic.com>
  */
 
-namespace CmsDoctrineORM\Query;
+namespace CmsDoctrineORM\Mapping\Translatable\Repository;
 
-use Doctrine\ORM\Query,
+use Doctrine\ORM\AbstractQuery,
     Doctrine\ORM\QueryBuilder;
 
 /**
- * Translatable Query interface
+ * Translatable Repository interface
  *
  * This is translatable repository that offers methods to retrieve results with translations
  */
-interface TranslatableQueryProviderInterface
+interface TranslatableRepositoryInterface
 {
     /**
      * @param string $locale
@@ -33,7 +33,7 @@ interface TranslatableQueryProviderInterface
     /**
      * @param QueryBuilder $qb
      * @param string $locale
-     * @return Query
+     * @return AbstractQuery
      */
-    public function getQuery(QueryBuilder $qb, $locale);
+    public function getTranslatableQuery(QueryBuilder $qb, $locale);
 }

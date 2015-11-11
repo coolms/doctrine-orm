@@ -13,70 +13,15 @@ namespace CmsDoctrineORM\Mapping\Hierarchy\Repository;
 use Doctrine\ORM\AbstractQuery,
     Gedmo\Tree\Entity\Repository\MaterializedPathRepository as GedmoMaterializedPathRepository,
     CmsCommon\Persistence\HierarchyMapperInterface,
-    CmsDoctrineORM\Mapping\Common\Repository\EntityRepositoryTrait;
+    CmsDoctrineORM\Persistence\HierarchyMapperTrait;
 
 /**
  * @author Dmitry Popov <d.popov@altgraphic.com>
  */
 class MaterializedPathRepository extends GedmoMaterializedPathRepository implements HierarchyMapperInterface
 {
-    use EntityRepositoryTrait;
-
-    /**
-     * {@inheritDoc}
-     */
-    public function childrenQueryBuilder($node = null, $direct = false, $orderBy = null,
-            $direction = 'ASC', $includeNode = false, array $options = [])
-    {
-        return parent::getChildrenQueryBuilder($node, $direct, $orderBy, $direction, $includeNode);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getChildrenQueryBuilder($node = null, $direct = false, $orderBy = null,
-            $direction = 'ASC', $includeNode = false, array $options = [])
-    {
-        return $this->childrenQueryBuilder($node, $direct, $orderBy, $direction, $includeNode, $options);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function childrenQuery($node = null, $direct = false, $orderBy = null, $direction = 'ASC',
-            $includeNode = false, array $options = [])
-    {
-        return $this->childrenQueryBuilder($node, $direct, $orderBy, $direction, $includeNode, $options)
-            ->getQuery();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getChildrenQuery($node = null, $direct = false, $orderBy = null, $direction = 'ASC',
-            $includeNode = false, array $options = [])
-    {
-        return $this->childrenQuery($node, $direct, $orderBy, $direction, $includeNode, $options);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function children($node = null, $direct = false, $orderBy = null, $direction = 'ASC',
-            $includeNode = false, array $options = [], $hydrationMode = AbstractQuery::HYDRATE_OBJECT)
-    {
-        return $this->childrenQuery($node, $direct, $orderBy, $direction, $includeNode, $options)
-            ->getResult($hydrationMode);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getChildren($node = null, $direct = false, $orderBy = null, $direction = 'ASC',
-            $includeNode = false, array $options = [], $hydrationMode = AbstractQuery::HYDRATE_OBJECT)
-    {
-        return $this->children($node, $direct, $orderBy, $direction, $includeNode, $options, $hydrationMode);
-    }
+    use HierarchyRepositoryTrait,
+        HierarchyMapperTrait;
 
     /**
      * {@inheritDoc}

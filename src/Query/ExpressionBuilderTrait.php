@@ -1,6 +1,6 @@
 <?php
 /**
- * CoolMS2 Doctrine ORM module (http://www.coolms.com/)
+ * CoolMS2 Doctrine ORM Module (http://www.coolms.com/)
  *
  * @link      http://github.com/coolms/doctrine-orm for the canonical source repository
  * @copyright Copyright (c) 2006-2015 Altgraphic, ALC (http://www.altgraphic.com)
@@ -10,7 +10,7 @@
 
 namespace CmsDoctrineORM\Query;
 
-use Zend\Filter\Word\SeparatorToCamelCase,
+use Zend\Filter\StaticFilter,
     Doctrine\ORM\Mapping\ClassMetadata,
     Doctrine\ORM\Query\Expr\Composite as CompositeExpression,
     Doctrine\ORM\Query\Expr\OrderBy as OrderByExpression,
@@ -46,7 +46,19 @@ trait ExpressionBuilderTrait
         MapperInterface::OP_CONTAIN                 => 'like',
         MapperInterface::OP_NOT_CONTAIN             => 'notLike',
         MapperInterface::OP_OR                      => 'or',
+        MapperInterface::OP_NOT                     => 'not',
+        MapperInterface::OP_INSTANCE_OF             => 'isInstanceOf',
     ];
+
+    protected $singleValuedOperators = [
+        'isNull',
+        'isNotNull',
+    ];
+
+    /**
+     * @return ClassMetadata
+     */
+    abstract public function getClassMetadata();
 
     /**
      * Recursively takes the specified criteria and adds to the expression.
@@ -92,27 +104,29 @@ trait ExpressionBuilderTrait
      * // AND ((field3 = 3) AND (field4 = 'four'))
      * // AND (field5 <> 5)
      *
+     * @param array $criteria
      * @param QueryBuilder $qb
      * @param CompositeExpression $expr
-     * @param array $criteria
      * @return CompositeExpression
      */
-    protected function buildExpr(QueryBuilder $qb, CompositeExpression $expr, array $criteria)
+    protected function buildExpr(array $criteria, QueryBuilder $qb, CompositeExpression $expr = null)
     {
-        $meta = $this->getClassMetadata();
+        if (null === $expr) {
+            $expr = $qb->expr()->andX();
+        }
 
-        foreach ($criteria as $expression => $comparison) {
-            if ($this->getExprOperator($expression) === 'or') {
-                $expr->add($this->buildExpr($qb, $qb->expr()->orX(), $comparison));
+        foreach ($criteria as $composite => $comparison) {
+            if ($this->getExprOperator($composite) === 'or') {
+                $expr->add($this->buildExpr($comparison, $qb, $qb->expr()->orX()));
                 continue;
             }
 
-            if ($this->getExprOperator($expression) === 'and') {
-                $expr->add($this->buildExpr($qb, $qb->expr()->andX(), $comparison));
+            if ($this->getExprOperator($composite) === 'and') {
+                $expr->add($this->buildExpr($comparison, $qb, $qb->expr()->andX()));
                 continue;
             }
 
-            list($field, $operator, $value) = $this->formatComparison($comparison, $expression, $qb);
+            list($field, $operator, $value) = $this->formatComparison($composite, $comparison, $qb);
 
             if (null === $field && null === $operator) {
                 $expr->add($value);
@@ -122,10 +136,10 @@ trait ExpressionBuilderTrait
             $alias      = '';
             $rootAlias  = $qb->getRootAlias();
             $paramName  = $this->getParamName($field, $qb);
-            $operator   = $this->getExprOperator($operator);
             $value      = $this->setWildCardInValue($operator, $value);
+            $operator   = $this->getExprOperator($operator);
 
-            if ($meta->hasAssociation($field) && !$meta->isSingleValuedAssociation($field)) {
+            if ($this->getClassMetadata()->isCollectionValuedAssociation($field)) {
                 $alias = "{$rootAlias}_$field";
                 $qb->join("$rootAlias.$field", $alias);
             }
@@ -135,7 +149,7 @@ trait ExpressionBuilderTrait
                     $alias = strpos($field, '.') === false ? "$rootAlias.$field" : $field;
                 }
 
-                if ($operator === 'isNull' || $operator === 'isNotNull') {
+                if (in_array($operator, $this->singleValuedOperators)) {
                     $expr->add($qb->expr()->{$operator}($alias));
                     continue;
                 } else {
@@ -175,17 +189,17 @@ trait ExpressionBuilderTrait
     }
 
     /**
-     * @param QueryBuilder $qb
-     * @param OrderByExpression $expr
      * @param array|string $orderBy
      * @param array|string $direction
+     * @param QueryBuilder $qb
+     * @param OrderByExpression $expr
      * @return OrderByExpression
      */
     protected function buildOrderByExpr(
+        $orderBy,
+        $direction,
         QueryBuilder $qb,
-        OrderByExpression $expr = null,
-        $orderBy = null,
-        $direction = null
+        OrderByExpression $expr = null
     ) {
         if (null === $expr) {
             $expr = new OrderByExpression();
@@ -221,11 +235,6 @@ trait ExpressionBuilderTrait
 
         return $expr;
     }
-
-    /**
-     * @return ClassMetadata
-     */
-    abstract public function getClassMetadata();
 
     /**
      * @param string $alias
@@ -265,25 +274,26 @@ trait ExpressionBuilderTrait
     }
 
     /**
+     * @param string|int $composite
      * @param mixed $comparison
-     * @param string|int $expression
      * @param QueryBuilder $qb
      * @return array
      */
-    private function formatComparison($comparison, $expression, QueryBuilder $qb)
+    private function formatComparison($composite, $comparison, QueryBuilder $qb)
     {
-        if (is_array($comparison) && is_int($expression)) {
+        if (is_int($composite) && is_array($comparison)) {
             if (count($comparison) !== 3) {
                 $comparison = [null, null, $comparison];
             } elseif (isset($comparison[1]) && !is_callable([$qb->expr(), $comparison[1]])) {
-                $filter = new SeparatorToCamelCase();
-                $className = 'Doctrine\\ORM\\Query\\AST\\' . $filter->filter($comparison[1]) . 'Expression';
+                $expression = StaticFilter::execute($comparison[1], 'Word\SeparatorToCamelCase');
+                $className = 'Doctrine\\ORM\\Query\\AST\\' . $expression . 'Expression';
                 if (class_exists($className)) {
                     $comparison[1] = strtoupper($comparison[1]);
                 }
             }
-        } elseif (!is_int($expression)) {
-            $comparison = [$expression, is_array($comparison) ? 'in' : 'eq', $comparison];
+
+        } elseif (!is_int($composite)) {
+            $comparison = [$composite, is_array($comparison) ? 'in' : 'eq', $comparison];
         } elseif (is_string($comparison)) {
             $comparison = [null, null, $comparison];
         }

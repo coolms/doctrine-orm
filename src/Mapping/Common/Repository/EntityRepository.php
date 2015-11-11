@@ -11,12 +11,14 @@
 namespace CmsDoctrineORM\Mapping\Common\Repository;
 
 use Doctrine\ORM\EntityRepository as DoctrineEntityRepository,
-    CmsCommon\Persistence\MapperInterface;
+    CmsCommon\Persistence\MapperInterface,
+    CmsDoctrineORM\Persistence\MapperTrait;
 
 /**
  * @author  Dmitry Popov <d.popov@altgraphic.com>
  */
 class EntityRepository extends DoctrineEntityRepository implements MapperInterface
 {
-    use EntityRepositoryTrait;
+    use EntityRepositoryTrait,
+        MapperTrait;
 }

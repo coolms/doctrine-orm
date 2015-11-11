@@ -10,15 +10,14 @@
 
 namespace CmsDoctrineORM\Mapping\Translatable\Repository;
 
-use CmsDoctrineORM\Query\TranslatableQueryProviderInterface,
-    CmsDoctrineORM\Mapping\Common\Repository\EntityRepository;
+use CmsDoctrineORM\Mapping\Common\Repository\EntityRepository;
 
 /**
  * Class TranslatableRepository
  *
  * This is translatable repository that offers methods to retrieve results with translations
  */
-class TranslatableRepository extends EntityRepository implements TranslatableQueryProviderInterface
+class TranslatableRepository extends EntityRepository implements TranslatableRepositoryInterface
 {
     use TranslatableRepositoryTrait;
 }

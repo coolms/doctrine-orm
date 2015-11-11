@@ -11,12 +11,20 @@
 namespace CmsDoctrineORM\Mapping\Translatable\Repository;
 
 use Doctrine\ORM\AbstractQuery,
+    Doctrine\ORM\Query,
     Doctrine\ORM\QueryBuilder,
-    CmsDoctrineORM\Query\TranslatableQueryProviderTrait;
+    Gedmo\Translatable\Query\TreeWalker\TranslationWalker,
+    CmsDoctrine\Mapping\Translatable\TranslatableSubscriber;
 
+/**
+ * @author Dmitry Popov <d.popov@altgraphic.com>
+ */
 trait TranslatableRepositoryTrait
 {
-    use TranslatableQueryProviderTrait;
+    /**
+     * @var string Locale
+     */
+    protected $translatableLocale;
 
     /**
      * {@inheritDoc}
@@ -26,7 +34,7 @@ trait TranslatableRepositoryTrait
     public function findQuery($id, $locale = null)
     {
         $qb = $this->findQueryBuilder($id);
-        return $this->getQuery($qb, $locale);
+        return $this->getTranslatableQuery($qb, $locale);
     }
 
     /**
@@ -57,7 +65,7 @@ trait TranslatableRepositoryTrait
     public function findOneByQuery(array $criteria, array $orderBy = null, $locale = null)
     {
         $qb = $this->getFindOneByQueryBuilder($criteria, $orderBy);
-        return $this->getQuery($qb, $locale);
+        return $this->getTranslatableQuery($qb, $locale);
     }
 
     /**
@@ -89,7 +97,7 @@ trait TranslatableRepositoryTrait
     public function findByQuery(array $criteria, array $orderBy = null, $limit = null, $offset = null, $locale = null)
     {
         $qb = $this->findByQueryBuilder($criteria, $orderBy, $limit, $offset);
-        return $this->getQuery($qb, $locale);
+        return $this->getTranslatableQuery($qb, $locale);
     }
 
     /**
@@ -121,7 +129,7 @@ trait TranslatableRepositoryTrait
     public function findAllQuery($locale = null)
     {
         $qb = $this->getFindAllQueryBuilder();
-        return $this->getQuery($qb, $locale);
+        return $this->getTranslatableQuery($qb, $locale);
     }
 
     /**
@@ -151,7 +159,7 @@ trait TranslatableRepositoryTrait
      */
     public function getOneOrNullResult(QueryBuilder $qb, $hydrationMode = null, $locale = null)
     {
-        return $this->getQuery($qb, $locale)->getOneOrNullResult($hydrationMode);
+        return $this->getTranslatableQuery($qb, $locale)->getOneOrNullResult($hydrationMode);
     }
 
     /**
@@ -161,7 +169,7 @@ trait TranslatableRepositoryTrait
      */
     public function getResult(QueryBuilder $qb, $hydrationMode = AbstractQuery::HYDRATE_OBJECT, $locale = null)
     {
-        return $this->getQuery($qb, $locale)->getResult($hydrationMode);
+        return $this->getTranslatableQuery($qb, $locale)->getResult($hydrationMode);
     }
 
     /**
@@ -171,7 +179,7 @@ trait TranslatableRepositoryTrait
      */
     public function getArrayResult(QueryBuilder $qb, $locale = null)
     {
-        return $this->getQuery($qb, $locale)->getArrayResult();
+        return $this->getTranslatableQuery($qb, $locale)->getArrayResult();
     }
 
     /**
@@ -181,7 +189,7 @@ trait TranslatableRepositoryTrait
      */
     public function getSingleResult(QueryBuilder $qb, $hydrationMode = null, $locale = null)
     {
-        return $this->getQuery($qb, $locale)->getSingleResult($hydrationMode);
+        return $this->getTranslatableQuery($qb, $locale)->getSingleResult($hydrationMode);
     }
 
     /**
@@ -191,7 +199,7 @@ trait TranslatableRepositoryTrait
      */
     public function getScalarResult(QueryBuilder $qb, $locale = null)
     {
-        return $this->getQuery($qb, $locale)->getScalarResult();
+        return $this->getTranslatableQuery($qb, $locale)->getScalarResult();
     }
 
     /**
@@ -201,6 +209,48 @@ trait TranslatableRepositoryTrait
      */
     public function getSingleScalarResult(QueryBuilder $qb, $locale = null)
     {
-        return $this->getQuery($qb, $locale)->getSingleScalarResult();
+        return $this->getTranslatableQuery($qb, $locale)->getSingleScalarResult();
+    }
+
+    /**
+     * @param string $locale
+     */
+    public function setTranslatableLocale($locale)
+    {
+        $this->translatableLocale = $locale;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTranslatableLocale()
+    {
+        if (null === $this->translatableLocale) {
+            return \Locale::getDefault();
+        }
+
+        return $this->translatableLocale;
+    }
+
+    /**
+     * Returns translated Doctrine query instance
+     *
+     * @param QueryBuilder $qb     A Doctrine query builder instance
+     * @param string       $locale A locale name
+     * @return AbstractQuery
+     */
+    public function getTranslatableQuery(QueryBuilder $qb, $locale = null)
+    {
+        $query  = $qb->getQuery();
+        $locale = $locale ?: $this->getTranslatableLocale();
+    
+        if ($locale) {
+            // Use Translation Walker
+            $query->setHint(Query::HINT_CUSTOM_OUTPUT_WALKER, TranslationWalker::class)
+            // Force the locale
+                ->setHint(TranslatableSubscriber::HINT_TRANSLATABLE_LOCALE, $locale);
+        }
+
+        return $query;
     }
 }
