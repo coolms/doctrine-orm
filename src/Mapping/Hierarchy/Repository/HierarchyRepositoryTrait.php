@@ -35,6 +35,7 @@ trait HierarchyRepositoryTrait
      * @param string|array  $direction
      * @param bool          $includeNode
      * @param array         $options
+     * @throws \InvalidArgumentException
      * @return QueryBuilder
      */
     public function childrenQueryBuilder($node = null, $criteria = false, $orderBy = null,
@@ -52,13 +53,27 @@ trait HierarchyRepositoryTrait
                ->innerJoin($this->getAlias() . '.object', 'object');
         }
 
-        if (is_array($criteria)) {
+        if ($criteria && is_array($criteria)) {
             $qb->andWhere($this->getFilter($qb)->create($criteria));
-            //$qb->andWhere($this->buildExpr($criteria, $qb));
         }
 
         if (null !== $orderBy) {
-            $qb->orderBy($this->buildOrderByExpr($orderBy, $direction, $qb));
+            $orderBy = (array) $orderBy;
+            if (null !== $direction) {
+                if (is_string($direction)) {
+                    $direction = array_fill(0, count($orderBy), $direction);
+                }
+            
+                $direction = (array) $direction;
+            
+                if (count($orderBy) === count($direction)) {
+                    $orderBy = array_combine($orderBy, $direction);
+                } else {
+                    throw new \InvalidArgumentException('Invalid sort options specified');
+                }
+            }
+
+            $qb->orderBy($this->normalizeOrderBy($orderBy, $qb));
         }
 
         return $qb;

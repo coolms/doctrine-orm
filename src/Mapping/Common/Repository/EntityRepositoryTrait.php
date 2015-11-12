@@ -12,15 +12,13 @@ namespace CmsDoctrineORM\Mapping\Common\Repository;
 
 use Doctrine\ORM\AbstractQuery,
     Doctrine\ORM\Mapping\ClassMetadata,
+    Doctrine\ORM\Query\Expr\OrderBy,
     Doctrine\ORM\QueryBuilder,
     CmsCommon\Mapping\Common\ObjectableInterface,
-    CmsDoctrineORM\Persistence\Filter\Filter,
-    CmsDoctrineORM\Query\ExpressionBuilderTrait;
+    CmsDoctrineORM\Persistence\Filter\Filter;
 
 trait EntityRepositoryTrait
 {
-    use ExpressionBuilderTrait;
-
     /**
      * @param string $alias
      * @param string $indexBy The index for the from.
@@ -170,14 +168,13 @@ trait EntityRepositoryTrait
 
         if ($criteria) {
             $expr = $this->getFilter($qb)->create($criteria);
-            //$expr = $this->buildExpr($criteria, $qb);
             if ($expr->count()) {
                 $qb->where($expr);
             }
         }
 
         if ($orderBy) {
-            $expr = $this->buildOrderByExpr(array_keys($orderBy), array_values($orderBy), $qb);
+            $expr = $this->normalizeOrderBy($orderBy, $qb);
             if ($expr->count()) {
                 $qb->orderBy($expr);
             }
@@ -192,6 +189,27 @@ trait EntityRepositoryTrait
         }
 
         return $qb;
+    }
+
+    /**
+     * @param array $orderBy
+     * @param QueryBuilder $qb
+     * @return OrderBy
+     */
+    protected function normalizeOrderBy(array $orderBy, QueryBuilder $qb)
+    {
+        $expr = new OrderBy();
+
+        foreach ($orderBy as $field => $direction) {
+            if (false === strpos($field, '.')) {
+                $rootAlias = $qb->getRootAlias();
+                $field     = "$rootAlias.$field";
+            }
+
+            $expr->add($field, $direction);
+        }
+
+        return $expr;
     }
 
     /**

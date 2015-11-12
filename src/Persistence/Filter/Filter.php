@@ -79,6 +79,49 @@ class Filter implements FilterInterface
     }
 
     /**
+     * Recursively takes the specified criteria and adds to the expression.
+     *
+     * The criteria is defined in an array notation where each item in the list
+     * represents a comparison <fieldName, operator, value>. The operator maps to
+     * comparison methods. The key in the array can be used to identify grouping
+     * of comparisons.
+     *
+     * @example
+     * $criteria = [
+     *      'orX' => [
+     *          ['field1', 'contain', 'field1Value'],
+     *          ['field2', 'notContain', 'field2Value'],
+     *      ],
+     *      'andX' => [
+     *          ['field3', 'equal', 3],
+     *          ['field4', 'equal', 'four'],
+     *      ],
+     *      ['field5', 'notEqual', 5],
+     * ];
+     * or
+     * $criteria = [
+     *      'ORX' => [
+     *          ['field1', 'CONTAIN', 'field1Value'],
+     *          ['field2', 'NOT_CONTAIN', 'field2Value'],
+     *      ],
+     *      'ANDX' => [
+     *          ['field3', 'EQUAL', 3],
+     *          ['field4', 'EQUAL', 'four'],
+     *      ],
+     *      ['field5', 'NOT_EQUAL', 5],
+     * ];
+     *
+     * $qb = new QueryBuilder();
+     * Filter::create($criteria);
+     * echo $qb->getSQL();
+     *
+     * // Result:
+     * // SELECT *
+     * // FROM tableName
+     * // WHERE ((field1 LIKE '%field1Value%') OR (field2 NOT LIKE '%field2Value%'))
+     * // AND ((field3 = 3) AND (field4 = 'four'))
+     * // AND (field5 <> 5)
+     *
      * @param array $criteria
      * @return Expr\Composite
      */
@@ -126,6 +169,11 @@ class Filter implements FilterInterface
                 $composite = $this->$operator();
                 $this->populate($comparisonOrValue, $composite);
                 $expr->add($composite);
+            } else {
+                $operator = $this->normalizeOperator($operatorOrField);
+                $composite = $this->getDefaultComposite();
+                $this->populate($comparisonOrValue, $composite);
+                $expr->add($this->$operator($composite));
             }
         }
     }
@@ -135,7 +183,7 @@ class Filter implements FilterInterface
      * @param mixed $value
      * @return array
      */
-    protected function setQueryParam($field, $value = null)
+    protected function setQueryParam($field)
     {
         $index = 0;
         $rootAlias = $this->qb->getRootAliases()[$index];
@@ -150,18 +198,26 @@ class Filter implements FilterInterface
         if ($meta->hasAssociation($assoc)) {
             if ($meta->isCollectionValuedAssociation($assoc)) {
                 $alias = "{$rootAlias}_$assoc";
-                $this->qb->join("$rootAlias.$assoc", $alias);
+                if (!in_array($alias, $this->qb->getAllAliases())) {
+                    $this->qb->leftJoin("$rootAlias.$assoc", $alias);
+                }
+
                 $assoc = $alias;
             }
 
             $targetClass = $meta->getAssociationTargetClass($assoc);
-            $targetMeta = $this->qb->getEntityManager()->getClassMetadata($targetClass);
-            if (isset($subField) && !$targetMeta->hasField($subField)) {
-                /**
-                 * @see http://stackoverflow.com/questions/7720138/doctrine2-polymorphic-queries-searching-on-properties-of-subclasses/27284741#27284741
-                 */
-                if ($targetMeta->isInheritanceTypeJoined()) {
-                    //exit;
+            $em = $this->qb->getEntityManager();
+            $targetMeta = $em->getClassMetadata($targetClass);
+            if (isset($subField) && !$targetMeta->hasField($subField) && $targetMeta->isInheritanceTypeJoined()) {
+                foreach ($targetMeta->discriminatorMap as $alias => $class) {
+                    $joinedMeta = $em->getClassMetadata($class);
+                    if ($joinedMeta->hasField($subField)) {
+                        if (!in_array($alias, $this->qb->getAllAliases())) {
+                            $this->qb->leftJoin($joinedMeta->getName(), $alias, 'WITH', "$alias.id = $assoc.id");
+                        }
+
+                        $assoc = $alias;
+                    }
                 }
             }
 
@@ -170,10 +226,16 @@ class Filter implements FilterInterface
             $alias = "$rootAlias.$field";
         }
 
-        if (null !== $value) {
-            $paramName = $this->getParamName($field);
-            $this->qb->setParameter($paramName, $value);
-            return [$alias, ":$paramName"];
+        $values = array_slice(func_get_args(), 1);
+        if ($values) {
+            $result = [$alias];
+            foreach ($values as $value) {
+                $paramName = $this->getParamName($field);
+                $this->qb->setParameter($paramName, $value);
+                $result[] = ":$paramName";
+            }
+
+            return $result;
         }
 
         return $alias;
@@ -486,9 +548,14 @@ class Filter implements FilterInterface
         return $this->qb->expr()->in($alias, $param);
     }
 
-    public function not()
+    /**
+     * {@inheritDoc}
+     *
+     * @return Expr\Func
+     */
+    public function not($restriction)
     {
-        
+        return $this->qb->expr()->not($restriction);
     }
 
     /**
@@ -513,9 +580,16 @@ class Filter implements FilterInterface
         return $this->qb->expr()->isNotNull($alias);
     }
 
+    /**
+     * @param string $field
+     * @param mixed $min
+     * @param mixed $max
+     * @return Expr\Func
+     */
     public function between($field, $min, $max)
     {
-        
+        list($alias, $minParam, $maxParam) = $this->setQueryParam($field, $min, $max);
+        return $this->qb->expr()->between($alias, $minParam, $maxParam);
     }
 
     /**
