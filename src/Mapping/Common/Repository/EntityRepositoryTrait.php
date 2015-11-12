@@ -169,8 +169,8 @@ trait EntityRepositoryTrait
         }
 
         if ($criteria) {
-            //$expr = $this->getFilter($qb)->create($criteria);
-            $expr = $this->buildExpr($criteria, $qb);
+            $expr = $this->getFilter($qb)->create($criteria);
+            //$expr = $this->buildExpr($criteria, $qb);
             if ($expr->count()) {
                 $qb->where($expr);
             }

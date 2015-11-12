@@ -10,12 +10,11 @@
 
 namespace CmsDoctrineORM\Persistence\Filter;
 
-use Doctrine\ORM\Query\Expr,
+use Doctrine\Common\Persistence\Mapping\ClassMetadata,
+    Doctrine\ORM\Query\Expr,
     Doctrine\ORM\QueryBuilder,
-    CmsCommon\Persistence\Filter\FilterInterface;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
-use Doctrine\ORM\Query\Expr\Composite;
-use CmsCommon\Stdlib\ArrayUtils;
+    CmsCommon\Persistence\Filter\FilterInterface,
+    CmsCommon\Stdlib\ArrayUtils;
 
 /**
  * Data Mapper filter implementation for Doctrine2 ORM
@@ -24,15 +23,17 @@ use CmsCommon\Stdlib\ArrayUtils;
  */
 class Filter implements FilterInterface
 {
+    use LikeQueryHelpers;
+
     /**
      * @var string
      */
-    protected $defaultLogic = FilterInterface::ANDX;
+    protected $defaultComposite = FilterInterface::ANDX;
 
     /**
      * @var array
      */
-    protected $logicOperators = [
+    protected $compositeOperators = [
         self::ANDX,
         self::ORX
     ];
@@ -47,6 +48,8 @@ class Filter implements FilterInterface
         self::GREATER_THAN_OR_EQUAL,
         self::LESS_THAN,
         self::LESS_THAN_OR_EQUAL,
+        self::IS_NULL,
+        self::IS_NOT_NULL,
         self::INSTANCE_OF,
     ];
 
@@ -71,42 +74,55 @@ class Filter implements FilterInterface
         $this->qb = $qb;
 
         if (null !== $operator) {
-            $this->setDefaultLogic($operator);
+            $this->setDefaultComposite($operator);
         }
     }
 
     /**
      * @param array $criteria
-     * @param QueryBuilder $qb
-     * @param ClassMetadata $meta
-     * @param Composite $expr
-     * @return Composite
+     * @return Expr\Composite
      */
     public function create(array $criteria)
     {
-        $expr = $this->getDefaultLogic();
+        $expr = $this->getDefaultComposite();
         $this->populate($criteria, $expr);
         return $expr;
     }
 
     /**
      * @param array $criteria
-     * @param Composite $expr
+     * @param Expr\Composite $expr
+     * @throws \InvalidArgumentException
      */
-    protected function populate(array $criteria, Composite $expr)
+    protected function populate(array $criteria, Expr\Composite $expr)
     {
+        if ($this->isComparison($criteria)) {
+            $expr->add($this->normalizeComparison($criteria));
+            return;
+        }
+
         foreach ($criteria as $operatorOrField => $comparisonOrValue) {
             if (!$this->isOperator($operatorOrField)) {
-                if (!$this->isComparison($comparisonOrValue)) {
+                if ($this->isComparison($comparisonOrValue)) {
+                    $comparison = $this->normalizeComparison($comparisonOrValue);
+                } else {
+                    if (!$this->isField($operatorOrField)) {
+                        throw new \InvalidArgumentException(sprintf(
+                            'Criteria format is invalid; "%s" is not a valid field for "%s" value',
+                            $operatorOrField,
+                            is_object($comparisonOrValue)
+                                ? get_class($comparisonOrValue)
+                                : print_r($comparisonOrValue, true)
+                        ));
+                    }
+
                     $operator = is_array($comparisonOrValue) ? static::IN : static::EQUAL;
                     $comparison = $this->$operator($operatorOrField, $comparisonOrValue);
-                } else {
-                    $comparison = $this->normalizeComparison($comparisonOrValue);
                 }
 
                 $expr->add($comparison);
-            } elseif ($this->isLogic($operatorOrField)) {
-                $operator = $this->resolveOperator($operatorOrField);
+            } elseif ($this->isComposite($operatorOrField)) {
+                $operator = $this->normalizeOperator($operatorOrField);
                 $composite = $this->$operator();
                 $this->populate($comparisonOrValue, $composite);
                 $expr->add($composite);
@@ -119,27 +135,48 @@ class Filter implements FilterInterface
      * @param mixed $value
      * @return array
      */
-    protected function populateQuery($field, $value = null)
+    protected function setQueryParam($field, $value = null)
     {
         $index = 0;
         $rootAlias = $this->qb->getRootAliases()[$index];
 
-        $meta = $this->getClassMetadata($index);
-        if ($meta->hasAssociation($field)) {
-            if ($meta->isCollectionValuedAssociation($field)) {
-                $alias = "{$rootAlias}_$field";
-                $this->qb->join("$rootAlias.$field", $alias);
-            } else {
-                $alias = $field;
-            }
+        if (false !== strpos($field, '.')) {
+            list($assoc, $subField) = explode('.', $field);
         } else {
-            $alias = strpos($field, '.') === false ? "$rootAlias.$field" : $field;
+            $assoc = $field;
         }
 
-        $paramName = $this->getParamName($field);
-        $this->qb->setParameter($paramName, $value);
+        $meta = $this->getClassMetadata($index);
+        if ($meta->hasAssociation($assoc)) {
+            if ($meta->isCollectionValuedAssociation($assoc)) {
+                $alias = "{$rootAlias}_$assoc";
+                $this->qb->join("$rootAlias.$assoc", $alias);
+                $assoc = $alias;
+            }
 
-        return [$alias, ":$paramName"];
+            $targetClass = $meta->getAssociationTargetClass($assoc);
+            $targetMeta = $this->qb->getEntityManager()->getClassMetadata($targetClass);
+            if (isset($subField) && !$targetMeta->hasField($subField)) {
+                /**
+                 * @see http://stackoverflow.com/questions/7720138/doctrine2-polymorphic-queries-searching-on-properties-of-subclasses/27284741#27284741
+                 */
+                if ($targetMeta->isInheritanceTypeJoined()) {
+                    //exit;
+                }
+            }
+
+            $alias = isset($subField) ? "$assoc.$subField" : $assoc;
+        } else {
+            $alias = "$rootAlias.$field";
+        }
+
+        if (null !== $value) {
+            $paramName = $this->getParamName($field);
+            $this->qb->setParameter($paramName, $value);
+            return [$alias, ":$paramName"];
+        }
+
+        return $alias;
     }
 
     /**
@@ -175,32 +212,42 @@ class Filter implements FilterInterface
     }
 
     /**
-     * @return Composite
+     * @return Expr\Composite
      */
-    protected function getDefaultLogic()
+    protected function getDefaultComposite()
     {
-        $logic = $this->defaultLogic;
-        return $this->qb->expr()->$logic();
+        return $this->qb->expr()->{$this->defaultComposite}();
     }
 
     /**
      * @param string $operator
      * @return self
      */
-    public function setDefaultLogic($operator)
+    public function setDefaultComposite($operator)
     {
-        $defaultLogic = $this->resolveOperator($operator);
-
-        if (!$this->isLogic($operator)) {
+        if (!$this->isComposite($operator)) {
             throw new \InvalidArgumentException(sprintf(
-                'Only %s are allowed as logic operators; %s given',
-                print_r($this->logicOperators, true),
+                'Only %s are allowed as composite operators; %s given',
+                print_r($this->compositeOperators, true),
                 $operator
             ));
         }
 
-        $this->defaultLogic = $defaultLogic;
+        $this->defaultComposite = $this->normalizeOperator($operator);
         return $this;
+    }
+
+    /**
+     * @param string $field
+     * @return bool
+     */
+    public function isField($field)
+    {
+        if (!is_string($field) || false !== strpos(' ', $field)) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -221,21 +268,21 @@ class Filter implements FilterInterface
             return false;
         }
 
-        return (bool) $this->resolveOperator($comparison[1]);
+        return $this->isOperator($comparison[1]);
     }
 
     /**
      * @param string $operator
      * @return bool
      */
-    public function isLogic($operator)
+    public function isComposite($operator)
     {
         if (!$this->isOperator($operator)) {
             return false;
         }
 
-        $operator = $this->resolveOperator($operator);
-        return in_array($operator, $this->logicOperators);
+        $operator = $this->normalizeOperator($operator);
+        return in_array($operator, $this->compositeOperators);
     }
 
     /**
@@ -244,7 +291,7 @@ class Filter implements FilterInterface
      */
     public function isOperator($operator)
     {
-        if (!is_string($operator)) {
+        if (!is_string($operator) || false !== strpos(' ', $operator)) {
             return false;
         }
 
@@ -255,20 +302,24 @@ class Filter implements FilterInterface
         $operators = $this->getOperators();
         return in_array($operator, $operators);
     }
+
     /**
      * @param string $operator
      * @throws \InvalidArgumentException
      * @return string
      */
-    protected function resolveOperator($operator)
+    protected function normalizeOperator($operator)
     {
         if (is_string($operator)) {
             if (defined("static::$operator")) {
-                return constant("static::$operator");
+                $operator = constant("static::$operator");
+                if (method_exists($this, $operator)) {
+                    return $operator;
+                }
             }
-    
+
             $operators = $this->getOperators();
-            if (in_array($operator, $operators)) {
+            if (in_array($operator, $operators, true) && method_exists($this, $operator)) {
                 $key = current(array_keys($operators, $operator, true));
                 return $operators[$key];
             }
@@ -293,7 +344,7 @@ class Filter implements FilterInterface
             ));
         }
 
-        $operator = $this->resolveOperator($comparison[1]);
+        $operator = $this->normalizeOperator($comparison[1]);
         array_splice($comparison, 1, 1);
 
         return call_user_func_array([$this, $operator], $comparison);
@@ -347,34 +398,70 @@ class Filter implements FilterInterface
         return $expr->addMultiple($comparisons);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return Expr\Comparison
+     */
     public function equal($field, $value)
     {
-        
+        list($alias, $param) = $this->setQueryParam($field, $value);
+        return $this->qb->expr()->eq($alias, $param);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return Expr\Comparison
+     */
     public function notEqual($field, $value)
     {
-        
+        list($alias, $param) = $this->setQueryParam($field, $value);
+        return $this->qb->expr()->neq($alias, $param);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return Expr\Comparison
+     */
     public function lessThan($field, $value)
     {
-        
+        list($alias, $param) = $this->setQueryParam($field, $value);
+        return $this->qb->expr()->lt($alias, $param);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return Expr\Comparison
+     */
     public function lessThanOrEqual($field, $value)
     {
-        
+        list($alias, $param) = $this->setQueryParam($field, $value);
+        return $this->qb->expr()->lte($alias, $param);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return Expr\Comparison
+     */
     public function greaterThan($field, $value)
     {
-        
+        list($alias, $param) = $this->setQueryParam($field, $value);
+        return $this->qb->expr()->gt($alias, $param);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return Expr\Comparison
+     */
     public function greaterThanOrEqual($field, $value)
     {
-        
+        list($alias, $param) = $this->setQueryParam($field, $value);
+        return $this->qb->expr()->gte($alias, $param);
     }
 
     /**
@@ -384,8 +471,8 @@ class Filter implements FilterInterface
      */
     public function in($field, $value)
     {
-        list($alias, $paramName) = $this->populateQuery($field, $value);
-        return $this->qb->expr()->in($alias, $paramName);
+        list($alias, $param) = $this->setQueryParam($field, $value);
+        return $this->qb->expr()->in($alias, $param);
     }
 
     /**
@@ -395,8 +482,8 @@ class Filter implements FilterInterface
      */
     public function notIn($field, $value)
     {
-        list($alias, $paramName) = $this->populateQuery($field, $value);
-        return $this->qb->expr()->in($alias, $paramName);
+        list($alias, $param) = $this->setQueryParam($field, $value);
+        return $this->qb->expr()->in($alias, $param);
     }
 
     public function not()
@@ -404,14 +491,26 @@ class Filter implements FilterInterface
         
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return string
+     */
     public function isNull($field)
     {
-        
+        $alias = $this->setQueryParam($field);
+        return $this->qb->expr()->isNull($alias);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return string
+     */
     public function isNotNull($field)
     {
-        
+        $alias = $this->setQueryParam($field);
+        return $this->qb->expr()->isNotNull($alias);
     }
 
     public function between($field, $min, $max)
@@ -419,39 +518,112 @@ class Filter implements FilterInterface
         
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return string
+     */
     public function beginWith($field, $value)
     {
-        
+        $value = $this->makeLikeParam($value, '%s%%');
+        list($alias, $param) = $this->setQueryParam($field, $value);
+        return $this->like($alias, $param);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return string
+     */
     public function notBeginWith($field, $value)
     {
-        
+        $value = $this->makeLikeParam($value, '%s%%');
+        list($alias, $param) = $this->setQueryParam($field, $value);
+        return $this->notLike($alias, $param);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return string
+     */
     public function endWith($field, $value)
     {
-        
+        $value = $this->makeLikeParam($value, '%%%s');
+        list($alias, $param) = $this->setQueryParam($field, $value);
+        return $this->like($alias, $param);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return string
+     */
     public function notEndWith($field, $value)
     {
-        
+        $value = $this->makeLikeParam($value, '%%%s');
+        list($alias, $param) = $this->setQueryParam($field, $value);
+        return $this->notLike($alias, $param);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return string
+     */
     public function contain($field, $value)
     {
-        
+        $value = $this->makeLikeParam($value);
+        list($alias, $param) = $this->setQueryParam($field, $value);
+        return $this->like($alias, $param);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return string
+     */
     public function notContain($field, $value)
     {
-        
+        $value = $this->makeLikeParam($value);
+        list($alias, $param) = $this->setQueryParam($field, $value);
+        return $this->notLike($alias, $param);
     }
 
+    /**
+     * Creates a LIKE() comparison expression with the given arguments.
+     *
+     * @param string $field Field in string format to be inspected by LIKE() comparison.
+     * @param string $param Argument to be used in LIKE() comparison.
+     *
+     * @return string
+     */
+    private function like($field, $param)
+    {
+        return "$field LIKE $param ESCAPE '!'";
+    }
+
+    /**
+     * Creates a NOT LIKE() comparison expression with the given arguments.
+     *
+     * @param string $field Field in string format to be inspected by LIKE() comparison.
+     * @param string $param Argument to be used in LIKE() comparison.
+     *
+     * @return string
+     */
+    private function notLike($field, $param)
+    {
+        return "$field NOT LIKE $param ESCAPE '!'";
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return Expr\Comparison
+     */
     public function isInstanceOf($field, $value)
     {
-        list($alias, $param) = $this->populateQuery($field, $value);
+        list($alias, $param) = $this->setQueryParam($field, $value);
         return $this->qb->expr()->isInstanceOf($alias, $param);
     }
 }
