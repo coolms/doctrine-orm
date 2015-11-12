@@ -22,7 +22,7 @@ use CmsCommon\Stdlib\ArrayUtils;
  *
  * @author Dmitry Popov <d.popov@altgraphic.com>
  */
-class Filter extends Composite implements FilterInterface
+class Filter implements FilterInterface
 {
     /**
      * @var string
@@ -32,20 +32,28 @@ class Filter extends Composite implements FilterInterface
     /**
      * @var array
      */
-    private $logicOperators = [
+    protected $logicOperators = [
         self::ANDX,
         self::ORX
+    ];
+
+    /**
+     * @var array
+     */
+    protected $comparisonOperators = [
+        self::EQUAL,
+        self::NOT_EQUAL,
+        self::GREATER_THAN,
+        self::GREATER_THAN_OR_EQUAL,
+        self::LESS_THAN,
+        self::LESS_THAN_OR_EQUAL,
+        self::INSTANCE_OF,
     ];
 
     /**
      * @var QueryBuilder
      */
     private $qb;
-
-    /**
-     * @var ClassMetadata
-     */
-    private $meta;
 
     /**
      * @var \ReflectionClass
@@ -55,34 +63,115 @@ class Filter extends Composite implements FilterInterface
     /**
      * __construct
      *
-     * @param array $criteria
      * @param QueryBuilder $qb
-     * @param ClassMetadata $class
+     * @param string $operator
      */
-    public function __construct($criteria = [], QueryBuilder $qb, ClassMetadata $meta)
+    public function __construct(QueryBuilder $qb, $operator = null)
     {
         $this->qb = $qb;
-        $this->meta = $meta;
 
-        if ($criteria) {
-            $this->exchangeArray($criteria);
+        if (null !== $operator) {
+            $this->setDefaultLogic($operator);
         }
     }
 
     /**
      * @param array $criteria
+     * @param QueryBuilder $qb
+     * @param ClassMetadata $meta
+     * @param Composite $expr
+     * @return Composite
      */
-    public function exchangeArray(array $criteria)
+    public function create(array $criteria)
     {
-        if (!ArrayUtils::hasStringKeys($criteria)) {
-            $expr = $this->getDefaultLogic();
+        $expr = $this->getDefaultLogic();
+        $this->populate($criteria, $expr);
+        return $expr;
+    }
+
+    /**
+     * @param array $criteria
+     * @param Composite $expr
+     */
+    protected function populate(array $criteria, Composite $expr)
+    {
+        foreach ($criteria as $operatorOrField => $comparisonOrValue) {
+            if (!$this->isOperator($operatorOrField)) {
+                if (!$this->isComparison($comparisonOrValue)) {
+                    $operator = is_array($comparisonOrValue) ? static::IN : static::EQUAL;
+                    $comparison = $this->$operator($operatorOrField, $comparisonOrValue);
+                } else {
+                    $comparison = $this->normalizeComparison($comparisonOrValue);
+                }
+
+                $expr->add($comparison);
+            } elseif ($this->isLogic($operatorOrField)) {
+                $operator = $this->resolveOperator($operatorOrField);
+                $composite = $this->$operator();
+                $this->populate($comparisonOrValue, $composite);
+                $expr->add($composite);
+            }
+        }
+    }
+
+    /**
+     * @param string $field
+     * @param mixed $value
+     * @return array
+     */
+    protected function populateQuery($field, $value = null)
+    {
+        $index = 0;
+        $rootAlias = $this->qb->getRootAliases()[$index];
+
+        $meta = $this->getClassMetadata($index);
+        if ($meta->hasAssociation($field)) {
+            if ($meta->isCollectionValuedAssociation($field)) {
+                $alias = "{$rootAlias}_$field";
+                $this->qb->join("$rootAlias.$field", $alias);
+            } else {
+                $alias = $field;
+            }
         } else {
-            $expr = $this;
+            $alias = strpos($field, '.') === false ? "$rootAlias.$field" : $field;
         }
 
-        foreach ($criteria as $operator => $comparison) {
-            
-        }
+        $paramName = $this->getParamName($field);
+        $this->qb->setParameter($paramName, $value);
+
+        return [$alias, ":$paramName"];
+    }
+
+    /**
+     * @param int $index
+     * @return ClassMetadata
+     */
+    protected function getClassMetadata($index = 0)
+    {
+        $rootClasses = $this->qb->getRootEntities();
+        return $this->qb->getEntityManager()->getClassMetadata($rootClasses[$index]);
+    }
+
+    /**
+     * @param string $field
+     * @return string
+     */
+    private function getParamName($field)
+    {
+        $paramName = str_replace('.', '_', $field);
+        $counter = 0;
+
+        do {
+            $index = substr($paramName, strrpos($paramName, '_') + 1);
+            if (is_numeric($index)) {
+                $paramName = substr_replace($paramName, $counter, strrpos($paramName, '_') + 1);
+                $counter++;
+            } else {
+                $paramName .= "_$counter";
+            }
+        } while ($this->qb->getParameter($paramName));
+
+        return $paramName;
     }
 
     /**
@@ -115,15 +204,57 @@ class Filter extends Composite implements FilterInterface
     }
 
     /**
+     * @param mixed $comparison
+     * @return bool
+     */
+    public function isComparison($comparison)
+    {
+        if (!is_array($comparison)) {
+            return false;
+        }
+
+        if (ArrayUtils::hasStringKeys($comparison) || count($comparison) < 2) {
+            return false;
+        }
+
+        if (!is_string($comparison[0]) || !is_string($comparison[1])) {
+            return false;
+        }
+
+        return (bool) $this->resolveOperator($comparison[1]);
+    }
+
+    /**
      * @param string $operator
      * @return bool
      */
     public function isLogic($operator)
     {
+        if (!$this->isOperator($operator)) {
+            return false;
+        }
+
         $operator = $this->resolveOperator($operator);
         return in_array($operator, $this->logicOperators);
     }
 
+    /**
+     * @param mixed $operator
+     * @return bool
+     */
+    public function isOperator($operator)
+    {
+        if (!is_string($operator)) {
+            return false;
+        }
+
+        if (defined("static::$operator")) {
+            return true;
+        }
+
+        $operators = $this->getOperators();
+        return in_array($operator, $operators);
+    }
     /**
      * @param string $operator
      * @throws \InvalidArgumentException
@@ -150,6 +281,25 @@ class Filter extends Composite implements FilterInterface
     }
 
     /**
+     * @param array $comparison
+     * @throws \InvalidArgumentException
+     * @return Expr\Comparison|Expr\Func|string
+     */
+    protected function normalizeComparison($comparison)
+    {
+        if (!$this->isComparison($comparison)) {
+            throw new \InvalidArgumentException(sprintf(
+                'Argument #1 is not a valid comparison'
+            ));
+        }
+
+        $operator = $this->resolveOperator($comparison[1]);
+        array_splice($comparison, 1, 1);
+
+        return call_user_func_array([$this, $operator], $comparison);
+    }
+
+    /**
      * @return array
      */
     public function getOperators()
@@ -167,11 +317,6 @@ class Filter extends Composite implements FilterInterface
         }
 
         return $this->reflectionClass;
-    }
-
-    public function getArrayCopy()
-    {
-        
     }
 
     /**
@@ -202,39 +347,111 @@ class Filter extends Composite implements FilterInterface
         return $expr->addMultiple($comparisons);
     }
 
-    public function equal($field, $value);
+    public function equal($field, $value)
+    {
+        
+    }
 
-    public function notEqual($field, $value);
+    public function notEqual($field, $value)
+    {
+        
+    }
 
-    public function lessThan($field, $value);
+    public function lessThan($field, $value)
+    {
+        
+    }
 
-    public function lessThanOrEqual($field, $value);
+    public function lessThanOrEqual($field, $value)
+    {
+        
+    }
 
-    public function greaterThan($field, $value);
+    public function greaterThan($field, $value)
+    {
+        
+    }
 
-    public function greaterThanOrEqual($field, $value);
+    public function greaterThanOrEqual($field, $value)
+    {
+        
+    }
 
-    public function in($field, $value);
+    /**
+     * {@inheritDoc}
+     *
+     * @return Expr\Func
+     */
+    public function in($field, $value)
+    {
+        list($alias, $paramName) = $this->populateQuery($field, $value);
+        return $this->qb->expr()->in($alias, $paramName);
+    }
 
-    public function notIn($field, $value);
+    /**
+     * {@inheritDoc}
+     *
+     * @return Expr\Func
+     */
+    public function notIn($field, $value)
+    {
+        list($alias, $paramName) = $this->populateQuery($field, $value);
+        return $this->qb->expr()->in($alias, $paramName);
+    }
 
-    public function not();
+    public function not()
+    {
+        
+    }
 
-    public function isNull($field);
+    public function isNull($field)
+    {
+        
+    }
 
-    public function isNotNull($field);
+    public function isNotNull($field)
+    {
+        
+    }
 
-    public function beginWith($field, $value);
+    public function between($field, $min, $max)
+    {
+        
+    }
 
-    public function notBeginWith($field, $value);
+    public function beginWith($field, $value)
+    {
+        
+    }
 
-    public function endWith($field, $value);
+    public function notBeginWith($field, $value)
+    {
+        
+    }
 
-    public function notEndWith($field, $value);
+    public function endWith($field, $value)
+    {
+        
+    }
 
-    public function contain($field, $value);
+    public function notEndWith($field, $value)
+    {
+        
+    }
 
-    public function notContain($field, $value);
+    public function contain($field, $value)
+    {
+        
+    }
 
-    public function instanceOfX($field, $value);
+    public function notContain($field, $value)
+    {
+        
+    }
+
+    public function isInstanceOf($field, $value)
+    {
+        list($alias, $param) = $this->populateQuery($field, $value);
+        return $this->qb->expr()->isInstanceOf($alias, $param);
+    }
 }

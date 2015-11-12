@@ -14,6 +14,7 @@ use Doctrine\ORM\AbstractQuery,
     Doctrine\ORM\Mapping\ClassMetadata,
     Doctrine\ORM\QueryBuilder,
     CmsCommon\Mapping\Common\ObjectableInterface,
+    CmsDoctrineORM\Persistence\Filter\Filter,
     CmsDoctrineORM\Query\ExpressionBuilderTrait;
 
 trait EntityRepositoryTrait
@@ -31,6 +32,16 @@ trait EntityRepositoryTrait
      * @return ClassMetadata
      */
     abstract public function getClassMetadata();
+
+    /**
+     * @param QueryBuilder $qb
+     * @param string $operator
+     * @return Filter
+     */
+    public function getFilter(QueryBuilder $qb = null, $operator = null)
+    {
+        return new Filter($qb ?: $this->createQueryBuilder($this->getAlias()), $operator);
+    }
 
     /**
      * @return string
@@ -158,6 +169,7 @@ trait EntityRepositoryTrait
         }
 
         if ($criteria) {
+            //$expr = $this->getFilter($qb)->create($criteria);
             $expr = $this->buildExpr($criteria, $qb);
             if ($expr->count()) {
                 $qb->where($expr);

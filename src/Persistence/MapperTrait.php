@@ -20,6 +20,7 @@ use Zend\EventManager\EventManagerAwareTrait,
     DoctrineORMModule\Paginator\Adapter\DoctrinePaginator as DoctrineAdapter,
     CmsDoctrine\Stdlib\Hydrator\DoctrineObject,
     CmsDoctrine\Tool\InitializerSubscriber;
+use CmsDoctrineORM\Persistence\Filter\Filter;
 
 trait MapperTrait
 {

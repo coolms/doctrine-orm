@@ -53,7 +53,8 @@ trait HierarchyRepositoryTrait
         }
 
         if (is_array($criteria)) {
-            $qb->andWhere($this->buildExpr($criteria, $qb));
+            $qb->andWhere($this->getFilter($qb)->create($criteria));
+            //$qb->andWhere($this->buildExpr($criteria, $qb));
         }
 
         if (null !== $orderBy) {
