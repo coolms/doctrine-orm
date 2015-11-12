@@ -12,11 +12,11 @@ namespace CmsDoctrineORM\Session;
 
 use Zend\ServiceManager\AbstractPluginManager,
     Zend\ServiceManager\ServiceLocatorInterface,
-    Zend\Session\Service\ContainerAbstractServiceFactory as ZendContainerAbstractServiceFactory,
+    Zend\Session\Service\ContainerAbstractServiceFactory as SessionContainerAbstractServiceFactory,
     Doctrine\ORM\EntityManager,
     CmsDoctrine\Session\Container;
 
-class ContainerAbstractServiceFactory extends ZendContainerAbstractServiceFactory
+class ContainerAbstractServiceFactory extends SessionContainerAbstractServiceFactory
 {
     /**
      * {@inheritDoc}
@@ -24,8 +24,9 @@ class ContainerAbstractServiceFactory extends ZendContainerAbstractServiceFactor
     public function canCreateServiceWithName(ServiceLocatorInterface $containers, $name, $requestedName)
     {
         if (!$containers instanceof AbstractPluginManager) {
-            throw new \BadMethodCallException('Domain session container abstract factory is meant to be used '
-                . 'only with a plugin manager');
+            throw new \BadMethodCallException(
+                'Domain session container abstract factory is meant to be used only with a plugin manager'
+            );
         }
 
         $services = $containers->getServiceLocator();
@@ -35,12 +36,16 @@ class ContainerAbstractServiceFactory extends ZendContainerAbstractServiceFactor
 
     /**
      * {@inheritDoc}
+     *
+     * @return Container
      */
     public function createServiceWithName(ServiceLocatorInterface $containers, $name, $requestedName)
     {
         if (!$this->canCreateServiceWithName($containers, $name, $requestedName)) {
-            throw new \BadMethodCallException('Domain session container abstract factory can\'t create container for "'
-                . $requestedName . '"');
+            throw new \BadMethodCallException(sprintf(
+                'Domain session container abstract factory can\'t create container for "%s"',
+                $requestedName
+            ));
         }
 
         $services = $containers->getServiceLocator();

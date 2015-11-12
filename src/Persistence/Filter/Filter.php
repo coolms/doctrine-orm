@@ -48,8 +48,17 @@ class Filter implements FilterInterface
         self::GREATER_THAN_OR_EQUAL,
         self::LESS_THAN,
         self::LESS_THAN_OR_EQUAL,
+        self::IN,
+        self::NOT_IN,
         self::IS_NULL,
         self::IS_NOT_NULL,
+        self::BETWEEN,
+        self::BEGIN_WITH,
+        self::NOT_BEGIN_WITH,
+        self::END_WITH,
+        self::NOT_END_WITH,
+        self::CONTAIN,
+        self::NOT_CONTAIN,
         self::INSTANCE_OF,
     ];
 
@@ -330,7 +339,13 @@ class Filter implements FilterInterface
             return false;
         }
 
-        return $this->isOperator($comparison[1]);
+        if (!$this->isOperator($comparison[1])) {
+            return false;
+        }
+
+        $comparison[1] = $this->normalizeOperator($comparison[1]);
+
+        return in_array($comparison[1], $this->comparisonOperators);
     }
 
     /**

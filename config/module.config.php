@@ -39,7 +39,7 @@ return [
                 'datetime_functions' => [
                     'YEAR' => 'DoctrineExtensions\Query\Mysql\Year',
                     'IFNULL' => 'DoctrineExtensions\Query\Mysql\IfNull',
-                    'DATE' => 'CmsDoctrineORM\Query\Mysql\Date',
+                    'DATE' => 'DoctrineExtensions\Query\Mysql\Date',
                 ],
                 'types' => [
                     'decimal_object' => DecimalObject::class,
