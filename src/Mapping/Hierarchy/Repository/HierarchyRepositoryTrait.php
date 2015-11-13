@@ -46,7 +46,13 @@ trait HierarchyRepositoryTrait
             $node = $this->findObjectNode($node, isset($options['root']) ? $options['root'] : null);
         }
 
-        $qb = parent::childrenQueryBuilder($node, ($criteria === true), $orderBy, $direction, $includeNode);
+        if (method_exists(get_parent_class(), 'childrenQueryBuilder')) {
+            $childrenQueryBuilder = 'childrenQueryBuilder';
+        } else {
+            $childrenQueryBuilder = 'getChildrenQueryBuilder';
+        }
+
+        $qb = parent::$childrenQueryBuilder($node, ($criteria === true), $orderBy, $direction, $includeNode);
 
         if (is_a($className, ObjectableInterface::class, true)) {
             $qb->addSelect('object')

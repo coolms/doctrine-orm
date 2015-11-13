@@ -159,6 +159,11 @@ class Filter implements FilterInterface
                     $comparison = $this->normalizeComparison($comparisonOrValue);
                 } else {
                     if (!$this->isField($operatorOrField)) {
+                        if (is_int($operatorOrField) && is_array($comparisonOrValue)) {
+                            $this->populate($comparisonOrValue, $expr);
+                            continue;
+                        }
+
                         throw new \InvalidArgumentException(sprintf(
                             'Criteria format is invalid; "%s" is not a valid field for "%s" value',
                             $operatorOrField,
@@ -205,6 +210,8 @@ class Filter implements FilterInterface
 
         $meta = $this->getClassMetadata($index);
         if ($meta->hasAssociation($assoc)) {
+            $targetClass = $meta->getAssociationTargetClass($assoc);
+
             if ($meta->isCollectionValuedAssociation($assoc)) {
                 $alias = "{$rootAlias}_$assoc";
                 if (!in_array($alias, $this->qb->getAllAliases())) {
@@ -214,7 +221,6 @@ class Filter implements FilterInterface
                 $assoc = $alias;
             }
 
-            $targetClass = $meta->getAssociationTargetClass($assoc);
             $em = $this->qb->getEntityManager();
             $targetMeta = $em->getClassMetadata($targetClass);
             if (isset($subField) && !$targetMeta->hasField($subField) && $targetMeta->isInheritanceTypeJoined()) {

@@ -38,6 +38,6 @@ class MaterializedPathRepository extends GedmoMaterializedPathRepository impleme
             $sortBy = array_merge($sortBy, $options['childSort']);
         }
 
-        return $this->getChildrenQueryBuilder($node, $direct, $sortBy['field'], $sortBy['dir'], $includeNode, $options);
+        return $this->childrenQueryBuilder($node, $direct, $sortBy['field'], $sortBy['dir'], $includeNode, $options);
     }
 }

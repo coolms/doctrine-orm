@@ -17,10 +17,11 @@ use Zend\EventManager\EventManagerAwareTrait,
     Doctrine\ORM\EntityManager,
     Doctrine\ORM\Mapping\ClassMetadata,
     Doctrine\ORM\Tools\Pagination\Paginator as ORMPaginator,
+    Doctrine\ORM\Query,
     DoctrineORMModule\Paginator\Adapter\DoctrinePaginator as DoctrineAdapter,
     CmsDoctrine\Stdlib\Hydrator\DoctrineObject,
-    CmsDoctrine\Tool\InitializerSubscriber;
-use CmsDoctrineORM\Persistence\Filter\Filter;
+    CmsDoctrine\Tool\InitializerSubscriber,
+    CmsDoctrineORM\Persistence\Filter\Filter;
 
 trait MapperTrait
 {
@@ -67,20 +68,16 @@ trait MapperTrait
      *
      * @param array $criteria
      * @param array $orderBy
-     * @param int $currentPageNumber
-     * @param int $itemCountPerPage
      * @return AdapterInterface
      */
-    public function getPaginatorAdapter(
-        array $criteria = [],
-        array $orderBy = []
-    ) {
+    public function getPaginatorAdapter(array $criteria = [], array $orderBy = []) {
         if ($criteria || $orderBy) {
             $query = $this->findByQuery($criteria, $orderBy);
         } else {
             $query = $this->findAllQuery();
         }
 
+        $query->setHydrationMode(Query::HYDRATE_ARRAY);
         $adapter = new DoctrineAdapter(new ORMPaginator($query));
 
         return $adapter;
