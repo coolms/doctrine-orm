@@ -36,7 +36,7 @@ trait ChangeableTrait
      * @param DateTime $changedAt
      * @return self
      */
-    public function setChangedAt(DateTime $changedAt)
+    public function setChangedAt(DateTime $changedAt = null)
     {
         $this->changedAt = $changedAt;
         return $this;
