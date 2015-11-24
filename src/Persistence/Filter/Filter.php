@@ -219,6 +219,13 @@ class Filter implements FilterInterface
                 }
 
                 $assoc = $alias;
+            } else {
+                $alias = "{$rootAlias}_$assoc";
+                if (!in_array($alias, $this->qb->getAllAliases())) {
+                    $this->qb->join("$rootAlias.$assoc", $alias);
+                }
+
+                $assoc = $alias;
             }
 
             $em = $this->qb->getEntityManager();
