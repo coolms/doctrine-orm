@@ -114,6 +114,16 @@ trait MapperTrait
     abstract public function findAll();
 
     /**
+     * @param string $name
+     * @return bool
+     */
+    public function hasField($name)
+    {
+        return $this->getClassMetadata()->hasField($name) ||
+            $this->getClassMetadata()->hasAssociation($name);
+    }
+
+    /**
      * @param array $criteria
      * @return object
      */
