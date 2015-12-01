@@ -203,8 +203,8 @@ trait MapperTrait
     public function add($entity)
     {
         $this->guardEntity($entity);
-        $em = $this->getEntityManager();
-        $em->persist($entity);
+        $this->getEntityManager()->persist($entity);
+
         return $this;
     }
 
@@ -217,6 +217,31 @@ trait MapperTrait
         $this->guardEntity($entity);
         $em = $this->getEntityManager();
         $em->persist($entity);
+
+        $meta = $this->getClassMetadata();
+        $mappings = $meta->getAssociationNames();
+        $uow = $em->getUnitOfWork();
+        $isChangeSetsComputed = false;
+        foreach ($mappings as $name) {
+            if ($meta->isAssociationInverseSide($name)) {
+                $prop = $meta->getReflectionProperty($name);
+                $prop->setAccessible(true);
+                if (!($assocValue = $prop->getValue($entity))) {
+                    continue;
+                }
+        
+                if ($meta->isSingleValuedAssociation($name)) {
+                    $uow->recomputeSingleEntityChangeSet($em->getClassMetadata(get_class($assocValue)), $assocValue);
+                    if ($em->getUnitOfWork()->isScheduledForUpdate($assocValue)) {
+                        $em->flush($assocValue);
+                    }
+                } elseif (!$isChangeSetsComputed) {
+                    $uow->computeChangeSets();
+                    $isChangeSetsComputed = true;
+                }
+            }
+        }
+
         return $this;
     }
 
@@ -227,8 +252,8 @@ trait MapperTrait
     public function remove($entity)
     {
         $this->guardEntity($entity);
-        $em = $this->getEntityManager();
-        $em->remove($entity);
+        $this->getEntityManager()->remove($entity);
+
         return $this;
     }
 
@@ -238,35 +263,7 @@ trait MapperTrait
      */
     public function save($entity = null)
     {
-        $em = $this->getEntityManager();
-        if (null !== $entity) {
-            $this->guardEntity($entity);
-            $meta = $this->getClassMetadata();
-            $mappings = $meta->getAssociationNames();
-            $uow = $em->getUnitOfWork();
-            $isChangeSetsComputed = false;
-            foreach ($mappings as $name) {
-                if ($meta->isAssociationInverseSide($name)) {
-                    $prop = $meta->getReflectionProperty($name);
-                    $prop->setAccessible(true);
-                    if (!($assocValue = $prop->getValue($entity))) {
-                        continue;
-                    }
-
-                    if ($meta->isSingleValuedAssociation($name)) {
-                        $uow->recomputeSingleEntityChangeSet($em->getClassMetadata(get_class($assocValue)), $assocValue);
-                        if ($em->getUnitOfWork()->isScheduledForUpdate($assocValue)) {
-                            $em->flush($assocValue);
-                        }
-                    } elseif (!$isChangeSetsComputed) {
-                        $uow->computeChangeSets();
-                        $isChangeSetsComputed = true;
-                    }
-                }
-            }
-        }
-
-        $em->flush($entity);
+        $this->getEntityManager()->flush($entity);
     }
 
     /**
